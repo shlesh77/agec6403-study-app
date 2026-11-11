@@ -2,7 +2,7 @@
 
 A phone-friendly study app for **AGEC 6403 Advanced Production** (Oklahoma State University, Fall 2026).
 
-**Open the app:** https://GITHUB_USER.github.io/agec6403-study-app/
+**Open the app:** https://shlesh77.github.io/agec6403-study-app/
 
 ## What is inside
 
