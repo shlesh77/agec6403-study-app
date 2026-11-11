@@ -1,0 +1,336 @@
+
+<!-- ===================== CHAPTER 4 ===================== -->
+<template data-chapter="4" data-part="I. The primal approach" data-title="Likelihood, hypothesis tests and SAS output" data-dates="Sep 9 · Sep 14 · Sep 18 · Sep 21 · Sep 25 · Assignments 2 and 5" data-color="4"></template>
+
+<template data-lesson="c4l1" data-ch="4" data-title="Likelihood, LR, Wald and LM tests" data-src="Sep 14, Sep 18 and Sep 25 lectures · laying-hens worksheet · Assignment 5" data-yt="likelihood ratio test Wald test Lagrange multiplier test">
+<section data-s="learn">
+<h3>The likelihood function</h3>
+<p>A <b>likelihood function</b> is the multivariate pdf of the data viewed as a function of the parameters. Maximum likelihood picks the parameters that maximize it. Proof of an optimum needs first- and second-order conditions; software usually checks only the first.</p>
+
+<h3>Five parts of a hypothesis test (Assignment 2, Q8)</h3>
+<ol class="pts"><li>Null hypothesis in terms of parameters.</li><li>Alternative hypothesis.</li><li>Test statistic.</li><li>p-value or critical value.</li><li>Conclusion in words.</li></ol>
+
+<h3>The three classical tests</h3>
+<div class="formula"><span class="lbl">Likelihood ratio (the course's workhorse)</span>
+\[LR=-2\big(\ln L(\tilde\theta)-\ln L(\hat\theta)\big)\ \xrightarrow{d}\ \chi^2_q,\]
+\(\tilde\theta\) restricted, \(\hat\theta\) unrestricted, \(q\) = number of restrictions. Needs both models.</div>
+<ul class="pts">
+<li><b>Wald</b>: uses only the unrestricted estimate and its covariance (the printed t-value). Behaves badly for nonlinear hypotheses and for variance parameters.</li>
+<li><b>Lagrange multiplier (score)</b>: uses only the restricted fit. Heteroskedasticity version: regress squared residuals on the variance predictors and use \(nR^2\sim\chi^2\).</li>
+</ul>
+<div class="prof"><span class="lbl">In class (Sep 14)</span>The class has mostly used likelihood-ratio tests, fewer Wald tests and few LM tests; "think about what the tests mean."</div>
+
+<h3>Testing a variance = 0: the boundary problem</h3>
+<p>Deterministic vs stochastic plateau: \(H_0:\sigma_\delta^2=0\) vs \(H_A:\sigma_\delta^2&gt;0\). The null value is on the <b>boundary</b> of the parameter space (a variance cannot be negative).</p>
+<div class="formula"><span class="lbl">Boundary result</span>Under \(H_0\), \(LR\sim\tfrac12\chi^2_0+\tfrac12\chi^2_1\). For a 5% test use the \(\chi^2_1\) <b>10%</b> critical value, <b>2.71</b>, not 3.84.</div>
+<div class="prof"><span class="lbl">In class (Sep 25)</span>If you simulated data with a zero random effect, about half the estimates would be exactly 0 and half positive. "To do the test at the 5% level, you need to use the ... I believe it's the 10% critical value." People often forget this. The Wald t-value for a variance "is not a good test. But it'll still be printed."</div>
+
+<h3>Nested and non-nested hypotheses</h3>
+<ul class="pts">
+<li><b>Nested</b>: restricting the larger model gives the smaller one (stochastic → deterministic plateau; skew-normal → normal). Use LR.</li>
+<li><b>Non-nested</b>: neither is a restriction of the other (quadratic vs linear plateau, both 3 parameters). With the same dependent variable and the same number of parameters, the model with the higher likelihood fits better (AIC just compares likelihoods). Different numbers of parameters: Cox test (complicated) or Vuong test ("a little bit shaky"); a J test is another option.</li>
+<li>R² has little meaning outside OLS.</li>
+</ul>
+<div class="exam"><span class="lbl">Exam 1 study guide item 9</span>Non-nested hypotheses are more likely to appear as a vocabulary term than as a calculation.</div>
+
+<h3>The Hausman test (as presented in class)</h3>
+<p>\(y=\min(\beta_0+\beta_1N,P)+\lambda_t\); \(H_0:\lambda_t\sim N(0,\sigma_\lambda^2)\) (random) vs \(H_A\): \(\lambda_t\) fixed. Estimate both (RANDOM statement vs year in CLASS and MODEL). Compare the statistic with its distribution under the null. "That's all the Hausman test is ... just standard hypothesis testing."</p>
+<div class="clarify"><span class="lbl">Clarifying: textbook Hausman</span>Hausman (1978) compares coefficient estimates: \(H=(b_{FE}-b_{RE})'[V_{FE}-V_{RE}]^{-1}(b_{FE}-b_{RE})\sim\chi^2\). The null is that the random effects are uncorrelated with the regressors, so RE is consistent and efficient. Rejecting favors fixed effects.</div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Laying hens: test homoskedasticity against variance varying with hens per cage by Wald, LR and LM.</summary><div class="body">
+<p>Model the variance as \(\sigma_a^2=\exp(\alpha_0+\sum_k\alpha_kD_{ak})\). \(H_0:\alpha_2=\dots=\alpha_5=0\).</p>
+<ul class="pts"><li><b>Wald</b>: fit the heteroskedastic model only; test \(\hat\alpha=0\) using its covariance matrix.</li><li><b>LR</b>: fit both; \(-2(\ln L_R-\ln L_U)\sim\chi^2_4\).</li><li><b>LM</b>: fit the homoskedastic model only; regress squared residuals on the dummies; \(nR^2\sim\chi^2_4\).</li></ul></div></details>
+<details class="sol"><summary>Assignment 5: restricted log L = −612.4, unrestricted = −610.9. Test deterministic vs stochastic plateau at 5%.</summary><div class="body"><p>\(LR=-2(-612.4+610.9)=3.0\). Boundary critical value 2.71 → <span class="ans">reject the deterministic plateau</span>. (With the naive 3.84 you would wrongly fail to reject.) Numbers are illustrative.</p></div></details>
+<details class="sol"><summary>Is skew-normal vs normal nested or non-nested?</summary><div class="body"><p>Nested: setting the skewness parameter to zero gives the normal.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Start here" data-by="StatQuest with Josh Starmer" href="https://www.youtube.com/watch?v=XepXtl9YKwc">Maximum Likelihood, clearly explained</a>
+<a class="vid" data-tag="LR test" data-by="MarinStatsLectures" href="https://www.youtube.com/watch?v=VehtSWkGszs">Likelihood Ratio Test (LRT) Explained</a>
+<a class="vid" data-tag="Wald test" data-by="Ben Lambert" href="https://www.youtube.com/watch?v=TFKbyXAfr1M">Wald Test: introduction</a>
+<a class="vid" data-tag="LM / score test" data-by="Ben Lambert" href="https://www.youtube.com/watch?v=Ck7EChMRQ9o">Score test (Lagrange Multiplier test): introduction</a>
+<a class="vid" data-tag="Hausman" data-by="Practical stats" href="https://www.youtube.com/watch?v=vi14VZ71AAM">Hausman Test Explained: Fixed vs Random Effects</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="1"><div class="stem">Testing \(\sigma^2_\delta=0\) at the 5% level with an LR test, the critical value is about:</div><ol><li>3.84</li><li>2.71</li><li>1.96</li><li>5.99</li></ol><div class="why">The null is on the boundary: use the χ²₁ 10% value.</div></div>
+<div class="q" data-a="0"><div class="stem">Which test uses only the restricted model?</div><ol><li>Lagrange multiplier (score)</li><li>Wald</li><li>Likelihood ratio</li><li>Vuong</li></ol><div class="why">LM evaluates the score at the restricted estimate.</div></div>
+<div class="q" data-a="3"><div class="stem">Quadratic vs linear plateau is:</div><ol><li>Nested, test with LR</li><li>Identical</li><li>Testable with R²</li><li>Non-nested</li></ol><div class="why">Neither model is a restriction of the other.</div></div>
+<div class="q" data-a="2"><div class="stem">Why is the Wald test poor for a variance parameter?</div><ol><li>It needs two models</li><li>It ignores the data</li><li>Wald tests behave badly for variance parameters near the boundary and for nonlinear hypotheses</li><li>It is always significant</li></ol><div class="why">The professor: "That's not a good test. But it'll still be printed."</div></div>
+<div class="q" data-a="1"><div class="stem">Which is NOT one of the five parts of a hypothesis test?</div><ol><li>Null in terms of parameters</li><li>The R² of the model</li><li>Test statistic</li><li>Conclusion in words</li></ol><div class="why">The five: null, alternative, statistic, p-value/critical value, conclusion.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Likelihood function</div><div class="b">The joint pdf of the data viewed as a function of the parameters</div></div>
+<div class="fc"><div class="f">LR statistic</div><div class="b">\(-2(\ln L_{restricted}-\ln L_{unrestricted})\sim\chi^2_q\)</div></div>
+<div class="fc"><div class="f">Boundary test 5% critical value</div><div class="b">2.71 (50:50 mixture of χ²₀ and χ²₁)</div></div>
+<div class="fc"><div class="f">Nested vs non-nested</div><div class="b">Nested: one model is a restriction of the other. Non-nested: neither is.</div></div>
+<div class="fc"><div class="f">Wald vs LR vs LM</div><div class="b">Wald: unrestricted only. LR: both. LM: restricted only.</div></div>
+</section>
+</template>
+
+<template data-lesson="c4l2" data-ch="4" data-title="Reading SAS programs and output" data-src="Sep 18 old-exam review · Sep 25 · Exam 1 study guide" data-yt="SAS PROC NLMIXED tutorial">
+<section data-s="learn">
+<h3>What the exam asks</h3>
+<p>"The objective changed from writing SAS statements to interpreting them." Expect a SAS question on PROC MIXED or PROC NLMIXED statements and output.</p>
+<h3>PROC MIXED pieces</h3>
+<pre class="code">proc mixed data=trial method=reml;
+  class variety year;
+  model yield = variety / solution;
+  random year;
+  lsmeans variety / pdiff;
+run;</pre>
+<ul class="pts"><li><b>CLASS</b>: discrete variables. <b>MODEL</b>: fixed effects. <b>RANDOM</b>: random effects. <b>LSMEANS</b>: adjusted treatment means.</li><li>Year in CLASS + MODEL = fixed year effects; year in RANDOM = random year effects (that switch is the Hausman comparison).</li></ul>
+
+<h3>PROC NLMIXED pieces</h3>
+<pre class="code">proc nlmixed data=lahoma qpoints=20;
+  parms b0=25 b1=0.3 pbar=45 s2u=0.2 s2e=30;
+  s2u_actual = s2u*100;              /* scaling: estimate s2u in units of 100 */
+  plateau = pbar + u;
+  mean = min(b0 + b1*n, plateau);
+  model yield ~ normal(mean, s2e);   /* NLMIXED normal() takes a VARIANCE */
+  random u ~ normal(0, s2u_actual) subject=year;
+run;</pre>
+<ul class="pts">
+<li><b>PARMS</b>: starting values. <b>RANDOM ... subject=year</b>: one random effect per year. A random effect inside min changes the plateau; outside it shifts the curve.</li>
+<li><b>QPOINTS</b>: Gaussian quadrature points used to integrate the random effect out of the likelihood (numerical integration; most integrals cannot be solved analytically).</li>
+<li><b>Scaling</b> (\(s2u\times100\)) changes the Hessian and makes estimation more stable; estimates must be rescaled when reported. On the exam, pointing with arrows to the scaling line is fine.</li>
+<li>Judge convergence from the <b>Gradient</b> column, not from the "converged" message.</li>
+<li>SAS macros and global variables loop over procedures (needed for a profile likelihood); data steps and procedures behave like subroutines with local variables.</li>
+</ul>
+<div class="warn"><span class="lbl">Units trap</span>SAS <code>rand('normal', mean, sd)</code> takes a standard deviation; NLMIXED <code>normal(mean, variance)</code> takes a variance; Stan <code>normal(mean, sd)</code> takes an SD.</div>
+<div class="prof"><span class="lbl">In class (Sep 25)</span>"That's a very big deal to us that you always put the import of the data in the program." Never import data by point-and-click; a former student could not reproduce which data he had used.</div>
+<div class="clarify"><span class="lbl">Clarifying: Assignment 5 estimation ladder</span>(i) Linear model in PROC MIXED; (ii) nonstochastic plateau in NLMIXED; (iii) stochastic plateau with METHOD=FIRO; (iv) without FIRO and with NOAD; if still stuck, print the Hessian (HESS) to find rescaling; always try alternative starting values. Urea at $650/ton is 46% N, so N costs \(650/(2000\times0.46)=\$0.71\) per lb.</div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Where in the NLMIXED program above is the plateau random?</summary><div class="body"><p><code>plateau = pbar + u;</code> with <code>random u ~ normal(0, s2u_actual) subject=year;</code> The year effect sits inside the min.</p></div></details>
+<details class="sol"><summary>Convert urea at $650/ton to $/lb N.</summary><div class="body"><p>One ton = 2,000 lb urea × 0.46 = 920 lb N. \(650/920=\)<span class="ans">$0.707/lb N</span>.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Likelihood" data-by="StatQuest with Josh Starmer" href="https://www.youtube.com/watch?v=XepXtl9YKwc">Maximum Likelihood, clearly explained</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="2"><div class="stem">In PROC NLMIXED, <code>normal(mean, s2e)</code> uses s2e as:</div><ol><li>A standard deviation</li><li>A precision</li><li>A variance</li><li>A coefficient of variation</li></ol><div class="why">NLMIXED takes a variance; SAS rand() and Stan take an SD.</div></div>
+<div class="q" data-a="0"><div class="stem">What does QPOINTS control?</div><ol><li>Number of Gaussian quadrature points to integrate out random effects</li><li>Number of iterations</li><li>Number of chains</li><li>Number of LS means</li></ol><div class="why">Quadrature = numerical integration.</div></div>
+<div class="q" data-a="1"><div class="stem">Why multiply a variance by 100 inside the program?</div><ol><li>To change units of yield</li><li>To rescale the parameter and stabilize the Hessian</li><li>To increase the likelihood</li><li>To avoid the CLASS statement</li></ol><div class="why">Scaling helps convergence; reverse it when reporting.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">CLASS / MODEL / RANDOM</div><div class="b">Discrete variables / fixed effects / random effects</div></div>
+<div class="fc"><div class="f">QPOINTS</div><div class="b">Quadrature points used to integrate random effects out of the NLMIXED likelihood</div></div>
+<div class="fc"><div class="f">Variance or SD? SAS rand, NLMIXED normal, Stan normal</div><div class="b">SD, variance, SD</div></div>
+<div class="fc"><div class="f">Urea price to N price</div><div class="b">$/ton ÷ (2,000 × 0.46)</div></div>
+</section>
+</template>
+
+<template data-review="4">
+<div class="ol"><div class="oq">Define a likelihood function.</div><div class="oa">The joint pdf of the data viewed as a function of the parameters.</div></div>
+<div class="ol"><div class="oq">List the five parts of a hypothesis test.</div><div class="oa">Null, alternative, test statistic, p-value or critical value, conclusion in words.</div></div>
+<div class="ol"><div class="oq">Formula for the LR statistic?</div><div class="oa">\(-2(\ln L_R-\ln L_U)\).</div></div>
+<div class="ol"><div class="oq">Degrees of freedom for an LR test?</div><div class="oa">Number of independent restrictions.</div></div>
+<div class="ol"><div class="oq">Which test needs only the unrestricted model?</div><div class="oa">Wald.</div></div>
+<div class="ol"><div class="oq">Which test needs only the restricted model?</div><div class="oa">Lagrange multiplier (score).</div></div>
+<div class="ol"><div class="oq">LM test for heteroskedasticity, in one line?</div><div class="oa">Regress squared residuals on variance predictors; \(nR^2\sim\chi^2\).</div></div>
+<div class="ol"><div class="oq">Why is testing a variance = 0 special?</div><div class="oa">The null is on the boundary of the parameter space.</div></div>
+<div class="ol"><div class="oq">Null distribution of LR on the boundary?</div><div class="oa">\(\tfrac12\chi^2_0+\tfrac12\chi^2_1\).</div></div>
+<div class="ol"><div class="oq">5% critical value for a boundary variance test?</div><div class="oa">2.71.</div></div>
+<div class="ol"><div class="oq">Why not use the printed Wald t for a variance?</div><div class="oa">Wald tests behave badly for variance parameters and nonlinear hypotheses.</div></div>
+<div class="ol"><div class="oq">Give an example of nested models.</div><div class="oa">Stochastic vs deterministic plateau; skew-normal vs normal.</div></div>
+<div class="ol"><div class="oq">Give an example of non-nested models.</div><div class="oa">Quadratic vs linear plateau.</div></div>
+<div class="ol"><div class="oq">How to compare non-nested models with equal parameters?</div><div class="oa">Higher likelihood fits better (same dependent variable).</div></div>
+<div class="ol"><div class="oq">Non-nested tests when parameter counts differ?</div><div class="oa">Cox test, Vuong test, J test.</div></div>
+<div class="ol"><div class="oq">Hausman null hypothesis?</div><div class="oa">Random effects are appropriate (uncorrelated with regressors).</div></div>
+<div class="ol"><div class="oq">What SAS change switches year from fixed to random?</div><div class="oa">Move year from CLASS/MODEL to the RANDOM statement.</div></div>
+<div class="ol"><div class="oq">What does PARMS do?</div><div class="oa">Gives starting values.</div></div>
+<div class="ol"><div class="oq">What does QPOINTS do?</div><div class="oa">Sets the Gaussian quadrature points for integrating out random effects.</div></div>
+<div class="ol"><div class="oq">Does NLMIXED normal() take a variance or SD?</div><div class="oa">Variance.</div></div>
+<div class="ol"><div class="oq">Why rescale parameters in SAS?</div><div class="oa">Better-conditioned Hessian and more stable convergence.</div></div>
+<div class="ol"><div class="oq">What must every SAS program include about the data?</div><div class="oa">The data import statements (no point-and-click).</div></div>
+<div class="ol"><div class="oq">Price of N from urea at $650/ton?</div><div class="oa">About $0.71 per lb N.</div></div>
+<div class="ol"><div class="oq">Is R² useful for comparing nonlinear models?</div><div class="oa">Not really; it has little meaning outside OLS.</div></div>
+</template>
+
+<!-- ===================== CHAPTER 5 ===================== -->
+<template data-chapter="5" data-part="III. Bayesian methods (taught Sep 21–30)" data-title="Bayesian estimation" data-dates="Sep 21 · Sep 25 · Sep 28 · Sep 30 · Oct 30 review · Assignment 6" data-color="5"></template>
+
+<template data-lesson="c5l1" data-ch="5" data-title="Bayes' rule, priors and credible intervals" data-src="Sep 21, Sep 25 and Sep 28 lectures · notebook 2026-09-27 pages · IMG_2649–2653" data-yt="Bayesian inference prior likelihood posterior normal normal conjugate">
+<section data-s="learn">
+<h3>Why Bayesian (and why it is capitalized)</h3>
+<p>Named after Thomas Bayes (1700s), so "Bayesian" is capitalized. Usual statistics is <b>frequentist</b> (Pearson; Fisher at Rothamsted — much of statistics came out of agronomy). In frequentist statistics the interval is random and the parameter is constant, so you cannot say a parameter has a 95% probability of being in an interval. Bayesian methods let you say exactly that.</p>
+<p>Why use it for the stochastic plateau:</p>
+<ol class="pts"><li>Better convergence.</li><li>You have prior information (corn switch point ≈150 lb N; higher in Nebraska, lower in Oklahoma). "The principle of econometrics is you have information, you ought to use it."</li><li>Avoids theoretical issues from the non-differentiability.</li><li>A random-effect variance is constrained positive, which complicates frequentist tests (the boundary problem).</li></ol>
+
+<div class="formula"><span class="lbl">Bayes' rule</span>
+\[P(\theta\mid y)=\frac{P(y\mid\theta)\,P(\theta)}{P(y)}\ \propto\ P(y\mid\theta)\,P(\theta).\]
+Posterior ∝ likelihood × prior. \(P(y)=\int P(y\mid\theta)P(\theta)\,d\theta\) is the normalizing constant (marginal likelihood).</div>
+<ul class="pts"><li><b>Posterior</b> \(P(\theta\mid y)\): distribution of the parameter given the data.</li><li><b>Likelihood</b> \(P(y\mid\theta)\): probability of the data given the parameters.</li><li><b>Prior</b> \(P(\theta)\): what you knew before these data.</li></ul>
+
+<h3>Kinds of priors</h3>
+<ul class="pts">
+<li><b>Informative</b>: \(\mu_T\sim N(150,40^2)\) for the corn threshold. "This is for the plateau threshold, not the optimum level."</li>
+<li><b>Weakly informative</b>: same mean, large SD (\(N(150,1000^2)\)); rules out absurd values (−5,000 or a million) but lets the data speak. Imposing positivity "is more of a restriction than you want."</li>
+<li><b>Diffuse / uninformative / Jeffreys</b>: improper uniform on \((-\infty,\infty)\). With a fully diffuse prior on OLS "you'll get the exact same model, because the prior is doing absolutely nothing."</li>
+<li>Already-used <b>certain</b> prior information: leaving sunspots out of a meat demand equation imposes an exact zero.</li>
+</ul>
+<div class="prof"><span class="lbl">In class (Sep 28)</span>Corn intercept ≈ 70 (somewhere between 40 and 110): a normal prior with mean 70 and SD 100 or 10,000 is weakly informative; SD 20 is informative ("more exact than I probably even am"). "If weakly informative σ = 1000; if informative σ = 20." Normal priors are common for α, β, μ<sub>T</sub>; gamma (or half-normal) for SDs. A normal prior for an SD "is still not a terrible thing," since sign restrictions increase bias.</div>
+
+<h3>Normal–normal updating</h3>
+<div class="formula"><span class="lbl">Prior μ ~ N(μ₀, σ₀²), likelihood of the sample mean ~ N(μ, σ²/n)</span>
+\[\mu_b=\frac{\sigma_0^2}{\sigma_0^2+\sigma^2/n}\,\tilde\mu+\frac{\sigma^2/n}{\sigma_0^2+\sigma^2/n}\,\mu_0,\qquad \sigma_b^2=\frac{\sigma_0^2\sigma^2}{n\sigma_0^2+\sigma^2}.\]
+Equivalently precisions add: \(1/\sigma_b^2=1/\sigma_0^2+n/\sigma^2\).</div>
+<ul class="pts"><li>A weighted average with weights summing to one; each weight is proportional to the <i>other</i> source's variance (more weight on the more precise source).</li><li>\(n\) affects only the likelihood. As \(n\to\infty\), the prior's weight → 0 and you get the likelihood back (consistency).</li></ul>
+<div data-tool="bayes"></div>
+
+<h3>Credible vs confidence intervals</h3>
+<ul class="pts">
+<li><b>Confidence (frequentist)</b>: the interval is random, the parameter fixed; "you can be 95% confident that this interval contains the true value" (95% of such intervals cover it).</li>
+<li><b>Credible (Bayesian)</b>: "given this, and this, and this, there's a 95% probability that the parameter lies inside this interval." From 10,000 posterior draws, drop 250 from each tail.</li>
+<li>"We're not talking about hypothesis tests anymore when we're in this Bayesian world." Intervals are what we ought to report.</li>
+</ul>
+<div class="exam"><span class="lbl">Oct 30 exam review</span>Know prior, likelihood, posterior and posterior predictive distribution. Know why Bayesian and classical point estimates can agree: (i) the prior is weak, (ii) informative data dominate the prior, or (iii) the prior is centered on the classical estimate. Agreement of point estimates is not the same as equal uncertainty.</div>
+</section>
+
+<section data-s="examples">
+<h3>Class worksheet (Sep 28)</h3>
+<details class="sol"><summary>Prior variance 10⁴, likelihood mean 5 with variance 2. Posterior?</summary><div class="body"><p>Weight on data \(=10^4/(10^4+2)\approx1\). Posterior mean ≈ 5; variance \(=2\cdot10^4/10002\approx\)<span class="ans">2</span>. You get the likelihood back.</p></div></details>
+<details class="sol"><summary>Prior mean 10 variance 2, likelihood mean 5 variance 2. Posterior?</summary><div class="body"><p>Equal precision → equal weights. Mean \(=(10+5)/2=\)<span class="ans">7.5</span>, variance \(=2\cdot2/(2+2)=\)<span class="ans">1</span>.</p></div></details>
+<details class="sol"><summary>Very tight prior (variance 0.01) at 10, likelihood mean 5 variance 2.</summary><div class="body"><p>Weight on data \(=0.01/2.01\approx0.005\): posterior ≈ <span class="ans">the prior (≈ 10)</span>.</p></div></details>
+<details class="sol"><summary>Prior N(60, 25), sample mean 50 with variance 25. Posterior?</summary><div class="body"><p>Equal precision: mean 55, variance 12.5.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Start here" data-by="3Blue1Brown" href="https://www.youtube.com/watch?v=HZGCoVF3YvM">Bayes theorem, the geometry of changing beliefs</a>
+<a class="vid" data-tag="Bayes rule" data-by="StatQuest with Josh Starmer" href="https://www.youtube.com/watch?v=9wCnvr7Xw4E">Bayes' Theorem, Clearly Explained</a>
+<a class="vid" data-tag="Intuition" data-by="Ben Lambert" href="https://www.youtube.com/watch?v=yvWlpwnT1nw">Explaining the intuition behind Bayesian inference</a>
+<a class="vid" data-tag="Normal–normal" data-by="Ox educ" href="https://www.youtube.com/watch?v=f3o9Crx3qx4">Normal prior conjugate to normal likelihood: intuition</a>
+<a class="vid" data-tag="Derivation" data-by="deetoher" href="https://www.youtube.com/watch?v=c-d05z0_5mw">Normal prior, normal likelihood, normal posterior</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="0"><div class="stem">The posterior is proportional to:</div><ol><li>Likelihood × prior</li><li>Prior ÷ likelihood</li><li>Likelihood + prior</li><li>The marginal likelihood</li></ol><div class="why">\(P(\theta\mid y)\propto P(y\mid\theta)P(\theta)\).</div></div>
+<div class="q" data-a="2"><div class="stem">What happens to the prior's influence as n grows?</div><ol><li>It grows</li><li>It stays constant</li><li>It goes to zero</li><li>It becomes the likelihood</li></ol><div class="why">n enters only the likelihood precision n/σ².</div></div>
+<div class="q" data-a="1"><div class="stem">Which statement is a Bayesian credible interval?</div><ol><li>95% of such intervals cover the fixed true value</li><li>Given the data and model, there is a 95% probability the parameter is in the interval</li><li>The parameter is in the interval with certainty</li><li>The p-value is below 0.05</li></ol><div class="why">Bayesian intervals make direct probability statements about parameters.</div></div>
+<div class="q" data-a="3"><div class="stem">Equal prior and likelihood variances of 2, means 10 and 5. Posterior variance?</div><ol><li>2</li><li>4</li><li>0.5</li><li>1</li></ol><div class="why">\(2\cdot2/(2+2)=1\).</div></div>
+<div class="q" data-a="0"><div class="stem">The informative prior \(N(150,40^2)\) is for the corn …</div><ol><li>Threshold (switch point), not the optimum</li><li>Optimal N rate</li><li>Yield intercept</li><li>Price of N</li></ol><div class="why">The optimum is higher (~180) because N is applied to where it is needed one year in six to ten.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Bayes' rule</div><div class="b">\(P(\theta\mid y)=P(y\mid\theta)P(\theta)/P(y)\)</div></div>
+<div class="fc"><div class="f">Informative vs weakly informative prior</div><div class="b">Same mean; small SD (e.g., 20) vs large SD (e.g., 1,000)</div></div>
+<div class="fc"><div class="f">Normal–normal posterior variance</div><div class="b">\(\sigma_0^2\sigma^2/(n\sigma_0^2+\sigma^2)\)</div></div>
+<div class="fc"><div class="f">Posterior mean weights</div><div class="b">Each source's weight ∝ the other source's variance</div></div>
+<div class="fc"><div class="f">When do Bayesian and ML estimates agree?</div><div class="b">Weak prior, data dominate, or prior centered on the classical estimate</div></div>
+</section>
+</template>
+
+<template data-lesson="c5l2" data-ch="5" data-title="MCMC, Stan and reading the output" data-src="Sep 21, Sep 28 and Sep 30 lectures · Assignment 6 · IMG_2650–2655" data-yt="MCMC explained Stan R-hat effective sample size">
+<section data-s="learn">
+<h3>Why MCMC</h3>
+<p>Computing \(P(y)\) needs heavy numerical integration; Bayesian methods were avoided for a long time because of it. <b>Markov chain Monte Carlo</b> gets around the integral ("a very clever way of doing it") and returns many draws from the posterior.</p>
+<ul class="pts">
+<li><b>Monte Carlo</b> = random number generation. <b>Markov</b> = only the current state matters (like a random walk). "Markov ... it's Russian."</li>
+<li>Output: \(\theta^{(1)},\dots,\theta^{(10{,}000)}\), each \(\theta^{(s)}=(\alpha^s,\beta^s,\mu_T^s,\sigma_T^s,\sigma^s)\). Posterior mean = average of draws; median = between the 5,000th and 5,001st sorted draws; 95% credible interval = cut 2.5% from each tail.</li>
+<li><b>Warm-up / burn-in</b>: starting values are drawn randomly from the priors; throw away the first ~1,000 draws so retained draws are from the posterior. (Specifying your own starting values is considered bad practice.)</li>
+<li><b>Convergence differs from ML.</b> ML parameters converge to a <i>point</i> (gradients → 0). MCMC should converge to a <i>distribution</i>: check R-hat and other diagnostics.</li>
+<li>Failure causes: too few iterations, poorly specified models ("funnels"), poor scaling, many tuning parameters.</li>
+<li>Algorithms: Metropolis–Hastings and Gibbs (JAGS, BUGS, SAS PROC MCMC); Hamiltonian Monte Carlo (Stan); INLA (R-INLA). MCMC is a rejection method: tighter acceptance is more accurate but slower.</li>
+</ul>
+
+<h3>Posterior predictive distribution</h3>
+<div class="formula"><span class="lbl">New site or year</span>\(T_{new}^{(s)}\sim N\big(\mu_T^{(s)},[\sigma_T^{(s)}]^2\big)\): one draw of the threshold for each posterior draw. Uses: filling missing values (NASS gaps, deleted yield-monitor points), predicting thresholds where no trial was run.</div>
+
+<h3>Assignment 6 in RStan</h3>
+<ul class="pts">
+<li>Install <b>Rtools first, then RStan</b>. "It's very important that you do this first and then that." R writes the Stan program, which compiles to C++.</li>
+<li>Program blocks: <b>data</b>, <b>parameters</b> (intercept, slope, plateau mean, plateau trend, variances), <b>transformed parameters</b> (year effects, like BLUPs), <b>model</b> (priors and likelihood), <b>generated quantities</b> (e.g., optimal N for each draw).</li>
+<li>Stan's <code>normal(mean, sd)</code> uses an SD. Variance parameters had half-normal priors centered on ML estimates with large variances: a form of <b>empirical Bayes</b> ("cheating a bit," acceptable because the variances are wide).</li>
+<li>Year effects drawn as standard normals and rescaled (non-centered): equivalent, faster.</li>
+<li><b>Hierarchical</b>: the likelihood is conditional on unobserved year effects, a middle layer between the prior and the data; those effects are <b>latent</b>.</li>
+<li>"I like this because it's the way I think. I can write the data generating process down. I don't have to write the likelihood down."</li>
+</ul>
+<div class="formula"><span class="lbl">The stan() call</span>chains = 4 (four random starts; if all end in the same place, evidence of convergence), iter = 4000 per chain, warmup = 2000, seed (repeatable results), adapt_delta = 0.95, max_treedepth = 12. Retained draws: 2,000 × 4 = 8,000. Thinning = 1.</div>
+
+<h3>Reading the output</h3>
+<ul class="pts">
+<li>25.663 = posterior mean of α; 22.959 to 28.442 = <b>credible</b> interval.</li>
+<li><b>n_eff</b> &lt; 8,000 because draws are autocorrelated (the plateau parameter is most autocorrelated).</li>
+<li><b>R-hat</b> above about 1.01 signals non-convergence. Divergent transitions = 0 and max-treedepth hits = 0 are good.</li>
+<li>Plateau trend: posterior probability positive = 0.9818: statistically marginal, economically large.</li>
+<li>If R-hat is bad: model design matters more than starting values. <b>Center the time trend</b> (subtract 2000) and rescale (÷10).</li>
+</ul>
+<div class="clarify"><span class="lbl">Clarifying: why 2027 optimal N differs from Assignment 5</span>With a plateau trend, the expected plateau in 2027 is higher than the sample average, so \(N^*\) for 2027 is higher than an optimum computed from a trendless plateau. Compute \(N^*\) for each posterior draw to get its posterior distribution.</div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Why is the Assignment 6 model called hierarchical?</summary><div class="body"><p>Because there are layers: priors on the hyperparameters (\(\mu,\sigma\) of year effects), latent year effects drawn from that distribution, and the data conditional on the year effects.</p></div></details>
+<details class="sol"><summary>How do you check convergence in Assignment 6?</summary><div class="body"><p>R-hat &lt; 1.01 for every parameter; adequate n_eff; zero divergent transitions; no max-treedepth hits; trace plots of the four chains overlap.</p></div></details>
+<details class="sol"><summary>How do you choose between the plateau with and without trend?</summary><div class="body"><p>Credible interval for the trend (does it exclude 0? posterior probability positive = 0.98) and a criterion such as LOO-CV or WAIC (or DIC).</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Start here" data-by="ritvikmath" href="https://www.youtube.com/watch?v=yApmR-c_hKU">Markov Chain Monte Carlo (MCMC): Data Science Concepts</a>
+<a class="vid" data-tag="Short" data-by="DataMListic" href="https://www.youtube.com/watch?v=nndtTssgtZE">Markov Chain Monte Carlo (MCMC) Explained</a>
+<a class="vid" data-tag="Stan setup" data-by="Stan" href="https://www.youtube.com/watch?v=4t6niM6sksI">Getting started with Stan in R</a>
+<a class="vid" data-tag="First program" data-by="Ben Lambert" href="https://www.youtube.com/watch?v=YZZSYIx1-mw">How to write your first Stan program</a>
+<a class="vid" data-tag="Deep dive" data-by="Andrew Gelman" href="https://www.youtube.com/watch?v=T1gYvX5c2sM">Introduction to Bayesian Data Analysis and Stan</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="1"><div class="stem">What does MCMC produce?</div><ol><li>A single point estimate</li><li>Many (autocorrelated) draws from the posterior</li><li>The prior</li><li>The normalizing constant P(y)</li></ol><div class="why">You summarize the draws (mean, median, credible intervals).</div></div>
+<div class="q" data-a="2"><div class="stem">An R-hat of 1.08 means:</div><ol><li>Excellent convergence</li><li>The prior is too strong</li><li>The chains have not converged</li><li>The model has no random effects</li></ol><div class="why">R-hat above ~1.01 is a convergence problem.</div></div>
+<div class="q" data-a="0"><div class="stem">Why is n_eff smaller than the number of retained draws?</div><ol><li>The draws are autocorrelated</li><li>Warm-up draws are included</li><li>Stan drops divergent draws</li><li>Chains run in parallel</li></ol><div class="why">Dependent draws carry less information than independent ones.</div></div>
+<div class="q" data-a="3"><div class="stem">Which install order works for RStan?</div><ol><li>RStan, then Rtools</li><li>Either order</li><li>Only RStan</li><li>Rtools first, then RStan</li></ol><div class="why">"It's very important that you do this first and then that."</div></div>
+<div class="q" data-a="1"><div class="stem">What is burn-in (warm-up)?</div><ol><li>The final draws kept for inference</li><li>Initial draws discarded so retained draws come from the posterior</li><li>The prior distribution</li><li>Thinning the chain</li></ol><div class="why">Starting values are arbitrary random draws from the priors.</div></div>
+<div class="q" data-a="2"><div class="stem">A fix the professor recommended for bad R-hat with a time trend:</div><ol><li>Use more informative priors only</li><li>Remove the year effects</li><li>Center and rescale the time trend</li><li>Reduce iterations</li></ol><div class="why">Subtract 2000 and divide by 10 to fix scaling.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">MCMC convergence vs ML convergence</div><div class="b">ML: to a point (gradient → 0). MCMC: to a distribution (R-hat ≈ 1).</div></div>
+<div class="fc"><div class="f">R-hat rule</div><div class="b">Values above about 1.01 are bad</div></div>
+<div class="fc"><div class="f">n_eff</div><div class="b">Effective number of independent draws; lower when draws are autocorrelated</div></div>
+<div class="fc"><div class="f">Posterior predictive draw</div><div class="b">\(T_{new}^{(s)}\sim N(\mu_T^{(s)},[\sigma_T^{(s)}]^2)\)</div></div>
+<div class="fc"><div class="f">Stan program blocks</div><div class="b">data, parameters, transformed parameters, model, generated quantities</div></div>
+<div class="fc"><div class="f">Hierarchical / latent</div><div class="b">Unobserved year effects form a middle layer between priors and data</div></div>
+</section>
+</template>
+
+<template data-review="5">
+<div class="ol"><div class="oq">Why is "Bayesian" capitalized?</div><div class="oa">It is named after Thomas Bayes.</div></div>
+<div class="ol"><div class="oq">State Bayes' rule.</div><div class="oa">\(P(\theta\mid y)=P(y\mid\theta)P(\theta)/P(y)\).</div></div>
+<div class="ol"><div class="oq">What is \(P(y)\) called and what does it do?</div><div class="oa">The marginal likelihood or normalizing constant; makes the posterior integrate to one.</div></div>
+<div class="ol"><div class="oq">Name the three key elements of Bayesian inference.</div><div class="oa">Prior, likelihood, posterior.</div></div>
+<div class="ol"><div class="oq">Give four reasons to use Bayesian methods for the stochastic plateau.</div><div class="oa">Convergence; prior information; avoids non-differentiability issues; avoids boundary problems for variances.</div></div>
+<div class="ol"><div class="oq">What makes a prior informative vs weakly informative?</div><div class="oa">Its variance: small = informative, large = weakly informative.</div></div>
+<div class="ol"><div class="oq">What is a diffuse (Jeffreys) prior?</div><div class="oa">An improper flat prior; the posterior then equals the likelihood shape.</div></div>
+<div class="ol"><div class="oq">Corn threshold informative prior used in class?</div><div class="oa">\(N(150,40^2)\).</div></div>
+<div class="ol"><div class="oq">Why is the corn optimum (~180) above the threshold prior mean (150)?</div><div class="oa">N is applied to where it is needed only one year in six to ten.</div></div>
+<div class="ol"><div class="oq">Normal–normal posterior mean in words?</div><div class="oa">A weighted average of prior mean and sample mean, weights ∝ the other source's variance.</div></div>
+<div class="ol"><div class="oq">Normal–normal posterior variance?</div><div class="oa">\(\sigma_0^2\sigma^2/(n\sigma_0^2+\sigma^2)\).</div></div>
+<div class="ol"><div class="oq">What happens to the posterior as n → ∞?</div><div class="oa">It approaches the likelihood; the prior stops mattering.</div></div>
+<div class="ol"><div class="oq">Credible vs confidence interval?</div><div class="oa">Credible: probability the parameter is inside. Confidence: the interval is random and covers the fixed value 95% of the time.</div></div>
+<div class="ol"><div class="oq">How do you get a 95% credible interval from 10,000 draws?</div><div class="oa">Sort and drop 250 from each tail.</div></div>
+<div class="ol"><div class="oq">When will Bayesian and ML point estimates be close?</div><div class="oa">Weak prior, strong data, or a prior centered on the ML estimate.</div></div>
+<div class="ol"><div class="oq">What does MCMC stand for?</div><div class="oa">Markov chain Monte Carlo.</div></div>
+<div class="ol"><div class="oq">What does "Markov" mean?</div><div class="oa">The next draw depends only on the current state.</div></div>
+<div class="ol"><div class="oq">Why is MCMC needed?</div><div class="oa">To avoid computing the normalizing integral P(y).</div></div>
+<div class="ol"><div class="oq">What is burn-in?</div><div class="oa">Discarded initial draws before the chain reaches the posterior.</div></div>
+<div class="ol"><div class="oq">How does MCMC convergence differ from ML convergence?</div><div class="oa">MCMC converges to a distribution; ML to a point.</div></div>
+<div class="ol"><div class="oq">Threshold for a bad R-hat?</div><div class="oa">Above about 1.01.</div></div>
+<div class="ol"><div class="oq">What is n_eff?</div><div class="oa">Effective number of independent draws.</div></div>
+<div class="ol"><div class="oq">Which algorithm does Stan use?</div><div class="oa">Hamiltonian Monte Carlo (NUTS).</div></div>
+<div class="ol"><div class="oq">Name two other MCMC algorithms and their software.</div><div class="oa">Metropolis–Hastings and Gibbs (JAGS, BUGS, SAS PROC MCMC).</div></div>
+<div class="ol"><div class="oq">What is the posterior predictive distribution used for?</div><div class="oa">Predicting new sites/years and filling missing values.</div></div>
+<div class="ol"><div class="oq">Install order for Stan in R?</div><div class="oa">Rtools, then RStan.</div></div>
+<div class="ol"><div class="oq">Assignment 6 stan() settings?</div><div class="oa">4 chains, 4,000 iterations, 2,000 warm-up, seed, adapt_delta 0.95, max_treedepth 12.</div></div>
+<div class="ol"><div class="oq">How many draws were retained?</div><div class="oa">8,000.</div></div>
+<div class="ol"><div class="oq">What is empirical Bayes in Assignment 6?</div><div class="oa">Priors centered on ML estimates (with large variances).</div></div>
+<div class="ol"><div class="oq">Why is the model hierarchical?</div><div class="oa">Latent year effects sit between the priors and the data.</div></div>
+<div class="ol"><div class="oq">What is a latent variable?</div><div class="oa">An unobserved variable, like the yearly threshold \(T_j\).</div></div>
+<div class="ol"><div class="oq">Fix for bad R-hat with a time trend?</div><div class="oa">Center the trend (subtract 2000) and rescale (÷10).</div></div>
+<div class="ol"><div class="oq">Stan normal(): variance or SD?</div><div class="oa">SD.</div></div>
+</template>

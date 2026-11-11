@@ -1,0 +1,175 @@
+
+<!-- ===================== PAGES (More tab) ===================== -->
+<template data-page="exam" data-title="Exam prep">
+<h2 class="display">Exam prep</h2>
+<p class="muted">Exams are closed book, long and challenging. The final is Wednesday, December 9, 8:00–9:50 am. Tick items as you master them; ticks are saved in this browser.</p>
+<div class="exam"><span class="lbl">How the professor writes exams</span>At least 80% of Exam 1 came from the study-guide items; old exams are on Canvas (2012–2024 sets are in your QUIZ/Canvas Files folder). He tests at Bloom's application level: "The memorizers find it harder than the learners." Blank answers get zero; write something. Expect scores to drop 10–15 points on later exams ("don't think you can cruise").</div>
+
+<h3>Exam 1 study guide (Part I)</h3>
+<div class="checklist">
+<label><input type="checkbox">Write a DGP for an ANOVA model (fixed or random effects, covariates) in effects format, dummy-variable regression, and matrix notation.</label>
+<label><input type="checkbox">Write a DGP for a deterministic plateau and a stochastic plateau.</label>
+<label><input type="checkbox">Write expected-profit-maximization problems (choice variable, choice space, objective, constraints).</label>
+<label><input type="checkbox">Find notational errors in typed equations.</label>
+<label><input type="checkbox">State the assumptions for E(price·quantity) = E(price)E(quantity).</label>
+<label><input type="checkbox">Explain common price-distribution assumptions and why price can be unconnected to quantity; yields stationary vs prices Markov.</label>
+<label><input type="checkbox">Calculate optimal input use for ANOVA (budgets), deterministic plateau, stochastic plateau and quadratic.</label>
+<label><input type="checkbox">Explain how to test non-nested hypotheses.</label>
+<label><input type="checkbox">Read and interpret SAS statements and output from PROC MIXED and PROC NLMIXED (scaling, gradients, QPOINTS).</label>
+<label><input type="checkbox">Identify needed changes in tables and figures.</label>
+<label><input type="checkbox">Vocabulary: ANOVA, error components, heteroskedasticity, likelihood function, random effects, replication, blocking factor, iteration, convergence.</label>
+<label><input type="checkbox">Answer prelim-style questions from class and homework, and new ones like them.</label>
+</div>
+
+<h3>Exam 2 and final (Parts II–III), from lecture hints</h3>
+<div class="checklist">
+<label><input type="checkbox">Draw the utility curve with chord, E u(π), u(E π), certainty equivalent and risk premium (Oct 2: "pretty good chance this graph will be on your exam").</label>
+<label><input type="checkbox">Explain why u(E π) ≠ E u(π) and where the probabilities go.</label>
+<label><input type="checkbox">Compute E-V efficient sets; draw CDFs showing lower mean and higher variance (Oct 5 "Test*").</label>
+<label><input type="checkbox">Draw CDFs for FSD vs SSD cases and know which combinations are impossible.</label>
+<label><input type="checkbox">Derive Arrow–Pratt r(w) for CARA, CRRA and log utility; spot the e^(−ρw) trick.</label>
+<label><input type="checkbox">Find the CE for an unfamiliar utility function by solving U(CE) = E U(W).</label>
+<label><input type="checkbox">Explain SDRF vs SERF (Oct 30: "good test question") and read a SERF graph.</label>
+<label><input type="checkbox">Identify nodes and weights for empirical, Monte Carlo and Gaussian quadrature; explain moment matching; evaluate weighted sums.</label>
+<label><input type="checkbox">Write a direct expected-utility maximization problem with numerical integration.</label>
+<label><input type="checkbox">Bayesian vocabulary: prior, likelihood, posterior, posterior predictive; credible vs confidence interval; when Bayesian and classical estimates agree.</label>
+<label><input type="checkbox">Read RStan output: posterior mean, credible interval, n_eff, R-hat, divergences.</label>
+<label><input type="checkbox">Stationarity question (promised again for the final, with a better wording).</label>
+<label><input type="checkbox">Copulas in words: link marginals, tail dependence.</label>
+</div>
+
+<h3>Question types on old exams</h3>
+<ul class="pts">
+<li>"Find five errors in the equation description below."</li>
+<li>"List two/three changes to make the figure conform to good graphical style." "What is wrong with this table?"</li>
+<li>"Mathematically define the optimization problem for an expected-profit-maximizing producer who must choose …" (cover crops vs clean till; varieties; N rate; acreage).</li>
+<li>"Mathematically specify an ANOVA model … treat year as random"; "a quadratic production function"; "the optimization problem with your estimated function."</li>
+<li>"Why is year usually treated as a random effect?"</li>
+<li>"Explain how you would test homoskedasticity by Wald, LR and LM."</li>
+<li>Expected utility / mean–variance / dominance calculations from a payoff table.</li>
+<li>Numerical integration and copula simulation questions (older exams; copula estimation is an extension).</li>
+</ul>
+<p class="muted">Your folders also hold solved study guides: Exam Study Guide/AGEC6403_Exam_Solution_Manual_By_Year.pdf and AGEC 6403 Chapter Study Materials/AGEC_6403_Cumulative_Practice_Exam.pdf.</p>
+</template>
+
+<template data-page="glossary" data-title="Glossary">
+<h2 class="display">Glossary</h2>
+<p class="muted">Terms as they were used in AGEC 6403.</p>
+<dl class="gloss">
+<dt>ANOVA</dt><dd>Analysis of variance; the model for designed experiments (regression is the word for observational data).</dd>
+<dt>argmax</dt><dd>The value of the choice variable that maximizes the objective; max is the resulting value.</dd>
+<dt>Arrow–Pratt absolute risk aversion</dt><dd>\(r(w)=-u''(w)/u'(w)\); positive for a risk-averse person; depends on units.</dd>
+<dt>Blocking factor</dt><dd>A grouping of similar experimental units (block/replication), usually modeled as a random effect.</dd>
+<dt>BLUP</dt><dd>Best linear unbiased predictor of a random effect; shrinks noisy estimates toward the mean (Bayesian shrinkage).</dd>
+<dt>Burn-in (warm-up)</dt><dd>Initial MCMC draws that are discarded.</dd>
+<dt>CARA</dt><dd>Constant absolute risk aversion; negative exponential utility \(1-e^{-rw}\).</dd>
+<dt>Certainty equivalent (CE)</dt><dd>The sure amount with the same utility as the gamble: \(u(CE)=E\,u(W)\).</dd>
+<dt>Choice space</dt><dd>The set the choice variable can take (\(\mathbb R_+\), \(\mathbb Z^+\), {0,1}, a list).</dd>
+<dt>Convergence (ML)</dt><dd>Iterations stop at a point where gradients are near zero (≈10⁻³).</dd>
+<dt>Convergence (MCMC)</dt><dd>Chains reach and mix over the same posterior distribution; checked with R-hat.</dd>
+<dt>Convex-set stochastic dominance</dt><dd>Dominance by a feasible mixture of other alternatives.</dd>
+<dt>Copula</dt><dd>A function linking marginal CDFs into a joint distribution: \(H(x,y)=C(F_X(x),F_Y(y))\).</dd>
+<dt>Credible interval</dt><dd>Bayesian interval with a stated posterior probability of containing the parameter.</dd>
+<dt>CRRA</dt><dd>Constant relative risk aversion; power utility \(w^{1-\rho}/(1-\rho)\).</dd>
+<dt>Data generating process (DGP)</dt><dd>A full statement of how the data arise: mean function, indices, random terms, distributions, independence.</dd>
+<dt>Delphi approach</dt><dd>Iteratively collecting and revising expert opinions when data are unavailable.</dd>
+<dt>Duality</dt><dd>Recovering technology from profit or cost functions of prices (observational data).</dd>
+<dt>Efficient set</dt><dd>Alternatives not dominated under a criterion (E-V, FSD, SSD, SDRF, SERF).</dd>
+<dt>Empirical Bayes</dt><dd>Priors centered on estimates from the same data (e.g., ML estimates with wide variances).</dd>
+<dt>Error components model</dt><dd>Random-effects panel model; the error is \(\mu_i+e_{it}\).</dd>
+<dt>E-V (mean–variance) efficiency</dt><dd>Dominance by higher mean and lower variance; needs risk aversion plus normality or quadratic utility.</dd>
+<dt>Expected utility</dt><dd>\(\sum_ip_iu(w_i)\) or \(\int u(w)f(w)\,dw\): average utility, not utility of the average.</dd>
+<dt>First-degree stochastic dominance (FSD)</dt><dd>\(F(\pi)\le G(\pi)\) for all π; needs only \(u'&gt;0\).</dd>
+<dt>Gaussian quadrature</dt><dd>Numerical integration with chosen nodes and weights matching moments through degree 2K − 1.</dd>
+<dt>Hausman test</dt><dd>Tests random vs fixed effects (whether effects are uncorrelated with regressors).</dd>
+<dt>Heteroskedasticity</dt><dd>Error variance that is a (deterministic) function of known variables Z.</dd>
+<dt>Hierarchical model</dt><dd>A model with layers: priors, latent random effects, data given the effects.</dd>
+<dt>Iteration</dt><dd>One update step of a numerical optimizer (not an experimental replication).</dd>
+<dt>Latent variable</dt><dd>An unobserved variable, such as the yearly threshold \(T_j\) or year random effects.</dd>
+<dt>Likelihood function</dt><dd>The joint pdf of the data viewed as a function of the parameters.</dd>
+<dt>Likelihood-ratio test</dt><dd>\(-2(\ln L_R-\ln L_U)\sim\chi^2_q\); boundary case uses the 10% value (2.71) for a 5% test.</dd>
+<dt>Linear plateau</dt><dd>\(y=\min(\beta_0+\beta_1N,P)\); Liebig-type limiting factor response.</dd>
+<dt>MCMC</dt><dd>Markov chain Monte Carlo; generates dependent draws from the posterior.</dd>
+<dt>n_eff</dt><dd>Effective sample size of MCMC draws after autocorrelation.</dd>
+<dt>Newsvendor problem</dt><dd>Choose quantity before random demand; \(F(q^*)=1-c/p\).</dd>
+<dt>Non-nested hypotheses</dt><dd>Neither model is a restriction of the other (quadratic vs linear plateau).</dd>
+<dt>Posterior predictive distribution</dt><dd>Distribution of a new observation (e.g., threshold at a new site) averaged over the posterior.</dd>
+<dt>Primal approach</dt><dd>Estimate the production function directly, then optimize.</dd>
+<dt>Prior (informative, weakly informative, diffuse)</dt><dd>Parameter distribution before the data; strength set by its variance; diffuse = flat/improper.</dd>
+<dt>Procedure</dt><dd>The required name of the methods section of the term paper (not "Methodology").</dd>
+<dt>R-hat</dt><dd>MCMC convergence diagnostic; values above about 1.01 are a problem.</dd>
+<dt>Random effect</dt><dd>An effect drawn from a distribution; used when not controlled by the researcher, for inference to all levels, and for efficiency.</dd>
+<dt>REML</dt><dd>Restricted maximum likelihood; corrects small-sample bias in variance estimates.</dd>
+<dt>Replication</dt><dd>The same treatment applied to more than one experimental unit.</dd>
+<dt>Risk premium</dt><dd>\(E(W)-CE\).</dd>
+<dt>Safety-first</dt><dd>Treating risk as a chance of loss, e.g., a bankruptcy-probability constraint.</dd>
+<dt>Second-degree stochastic dominance (SSD)</dt><dd>Integrated CDFs ordered everywhere; needs \(u'&gt;0\), \(u''&lt;0\).</dd>
+<dt>SDRF</dt><dd>Stochastic dominance with respect to a function: bounds on absolute risk aversion, utility form unspecified (Meyer).</dd>
+<dt>SERF</dt><dd>Stochastic efficiency with respect to a function: compare CEs across a range of risk aversion for a chosen utility family (Richardson).</dd>
+<dt>Stationarity</dt><dd>Distributional features (e.g., mean) that do not change over time; assumed for detrended yields.</dd>
+<dt>Stochastic plateau</dt><dd>Plateau \(P_t=\bar P+\delta_t\) with \(\delta_t\) random (rainfall).</dd>
+<dt>Value of information</dt><dd>Optimized expected profit with information minus without it.</dd>
+</dl>
+</template>
+
+<template data-page="howto" data-title="How to add content">
+<h2 class="display">How to add content</h2>
+<p>The app is one HTML file. Everything you see comes from <code>&lt;template&gt;</code> blocks, so you add material by copying a block and editing its text. No programming is needed.</p>
+<div class="tip"><b>Where the files are.</b> <code>AGEC 6403/Study App/</code> holds the finished app (<code>AGEC6403_Study_App.html</code>), the parts in <code>src/</code>, a <code>build.sh</code> script that joins the parts, and <code>HOW_TO_EDIT.md</code> with these same instructions.</div>
+
+<h3>Three ways to update</h3>
+<ol class="pts">
+<li><b>Easiest: ask Claude.</b> Open Claude Code in the AGEC 6403 folder and say, for example: "Add a lesson to Chapter 10 on stochastic frontiers using my Nov 4 notes, with a quiz, cards and one-line review questions, then rebuild and republish the study app." Claude edits <code>src/</code>, runs <code>build.sh</code> and republishes to the same link.</li>
+<li><b>Edit the parts yourself.</b> Open the right file in <code>src/</code> (chapters 0–1 in <code>10_…</code>, 2–3 in <code>20_…</code>, and so on), copy a block, edit it, then run <code>bash build.sh</code> in the Study App folder. Open the built HTML in a browser to check.</li>
+<li><b>Edit the built file directly.</b> Every block is also inside <code>AGEC6403_Study_App.html</code>. Edits there are lost if you later run <code>build.sh</code>, so prefer <code>src/</code>.</li>
+</ol>
+
+<h3>Add a lesson</h3>
+<pre class="code">&lt;template data-lesson="c10l2" data-ch="10" data-title="Stochastic frontiers"
+          data-src="Lecture Nov 4" data-yt="stochastic frontier analysis"&gt;
+  &lt;section data-s="learn"&gt; &lt;h3&gt;Heading&lt;/h3&gt; &lt;p&gt;Text with math \( \ln y = f(x) + v - u \)&lt;/p&gt; &lt;/section&gt;
+  &lt;section data-s="examples"&gt; ... &lt;/section&gt;
+  &lt;section data-s="watch"&gt; ... &lt;/section&gt;
+  &lt;section data-s="quiz"&gt; ... &lt;/section&gt;
+  &lt;section data-s="cards"&gt; ... &lt;/section&gt;
+&lt;/template&gt;</pre>
+<p>Lesson ids must be unique (<code>c</code> + chapter + <code>l</code> + number). Lessons appear in the order they are written. Leave out any section you do not need.</p>
+
+<h3>Add a YouTube video</h3>
+<pre class="code">&lt;a class="vid" data-tag="Start here" data-by="Channel name"
+   href="https://www.youtube.com/watch?v=VIDEO_ID"&gt;Video title&lt;/a&gt;</pre>
+<p>Every Watch tab also gets a "Search YouTube" link built from the lesson's <code>data-yt</code> words.</p>
+
+<h3>Add a quiz question</h3>
+<pre class="code">&lt;div class="q" data-a="1"&gt;   &lt;!-- right answer: 0 = A, 1 = B, 2 = C ... --&gt;
+  &lt;div class="stem"&gt;Question?&lt;/div&gt;
+  &lt;ol&gt;&lt;li&gt;Option A&lt;/li&gt;&lt;li&gt;Option B&lt;/li&gt;&lt;li&gt;Option C&lt;/li&gt;&lt;/ol&gt;
+  &lt;div class="why"&gt;Explanation shown after answering.&lt;/div&gt;
+&lt;/div&gt;</pre>
+<p>New questions join the Practice tab automatically.</p>
+
+<h3>Add a worked example, flashcard or one-line review question</h3>
+<pre class="code">&lt;details class="sol"&gt;&lt;summary&gt;Problem&lt;/summary&gt;&lt;div class="body"&gt;Solution&lt;/div&gt;&lt;/details&gt;
+&lt;div class="fc"&gt;&lt;div class="f"&gt;Front&lt;/div&gt;&lt;div class="b"&gt;Back&lt;/div&gt;&lt;/div&gt;
+&lt;div class="ol"&gt;&lt;div class="oq"&gt;One-line question&lt;/div&gt;&lt;div class="oa"&gt;Answer&lt;/div&gt;&lt;/div&gt;</pre>
+<p>One-line questions go inside the chapter's <code>&lt;template data-review="N"&gt;</code> block.</p>
+
+<h3>Add a chapter</h3>
+<pre class="code">&lt;template data-chapter="11" data-part="IV. Special topics" data-title="Duality"
+          data-dates="Nov 9 · Nov 11" data-color="4"&gt;&lt;/template&gt;</pre>
+<p>Then add lessons with <code>data-ch="11"</code> and a <code>&lt;template data-review="11"&gt;</code>. Colors 1–10 are available. Add <code>data-preview</code> to mark a chapter as not yet taught.</p>
+
+<h3>Boxes you can use in lessons</h3>
+<ul class="pts">
+<li><code>&lt;div class="formula"&gt;&lt;span class="lbl"&gt;Label&lt;/span&gt;…&lt;/div&gt;</code> key formula</li>
+<li><code>class="clarify"</code> blue explanation · <code>class="prof"</code> what the professor said · <code>class="exam"</code> exam alert · <code>class="warn"</code> common mistake · <code>class="tip"</code> tip</li>
+<li>Interactive labs: <code>&lt;div data-tool="plateau"&gt;&lt;/div&gt;</code> (also <code>newsvendor</code>, <code>bayes</code>, <code>ce</code>, <code>rank</code>, <code>quad</code>, <code>quadopt</code>, <code>revenue</code>).</li>
+</ul>
+
+<h3>Things to know</h3>
+<ul class="pts">
+<li>Math: inline <code>\( … \)</code>, display <code>\[ … \]</code>. Inside math write <code>&amp;lt;</code> for "less than" and <code>&amp;gt;</code> for "greater than."</li>
+<li>Your progress, notes and personal cards live in your browser. Use More → Back up your progress before switching devices.</li>
+<li>For quick personal additions without editing files, use a lesson's <b>My notes</b> tab or <b>Cards → Add your own card</b>.</li>
+</ul>
+</template>

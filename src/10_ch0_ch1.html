@@ -1,0 +1,383 @@
+
+<!-- =====================================================================
+     CONTENT FORMAT (copy these patterns to add more)
+     Chapter:  <template data-chapter="N" data-part="Part name" data-title="..." data-dates="..." data-color="1-10"></template>
+     Lesson:   <template data-lesson="cNlM" data-ch="N" data-title="..." data-src="where it came from" data-yt="YouTube search words">
+                 <section data-s="learn"> ... </section>      (text, formulas, boxes, <div data-tool="name"></div>)
+                 <section data-s="examples"> <details class="sol"><summary>Question</summary><div class="body">Answer</div></details> </section>
+                 <section data-s="watch"> <a class="vid" data-tag="Start here" data-by="Channel" href="https://www.youtube.com/watch?v=ID">Title</a> </section>
+                 <section data-s="quiz"> <div class="q" data-a="0-based index of right answer"><div class="stem">Q</div><ol><li>A</li>...</ol><div class="why">Why</div></div> </section>
+                 <section data-s="cards"> <div class="fc"><div class="f">Front</div><div class="b">Back</div></div> </section>
+               </template>
+     Review:   <template data-review="N"> <div class="ol"><div class="oq">One-line question</div><div class="oa">Answer</div></div> ... </template>
+     Boxes:    <div class="formula"><span class="lbl">Label</span>...</div>  .clarify (blue, explanation)  .prof (what the professor said)  .exam (exam alert)  .warn (common mistake)  .tip
+     Math:     inline \( ... \), display \[ ... \]. Write < as &lt; inside math.
+     ===================================================================== -->
+
+<!-- ===================== CHAPTER 0 ===================== -->
+<template data-chapter="0" data-part="Getting started" data-title="Course roadmap" data-dates="Syllabus · Aug 31 · Oct 2 flowchart" data-color="10"></template>
+
+<template data-lesson="c0l1" data-ch="0" data-title="What this course is about" data-src="Syllabus Fall 2026 · Aug 31 and Sep 2 lectures" data-yt="production economics research agricultural economics">
+<section data-s="learn">
+<h3>The course in one sentence</h3>
+<p>AGEC 6403 (Advanced Production, Dr. B. Wade Brorsen) teaches the research techniques needed to solve applied production problems, using the <b>primal approach</b> (estimate the production function directly from experiments) rather than the dual approach, with heavy emphasis on <b>decision making under risk</b>.</p>
+
+<h3>The four course objectives</h3>
+<p>After the course you should be able to:</p>
+<ol class="pts">
+<li>Estimate production functions from data from an agronomy experiment.</li>
+<li>Mathematically specify a data generating process (DGP).</li>
+<li>Mathematically specify a producer's objective function for a real-world situation.</li>
+<li>Determine the optimal quantities of inputs and outputs with and without risk aversion.</li>
+</ol>
+
+<h3>The research chain used in every assignment</h3>
+<div class="formula"><span class="lbl">Theory → empirical model → decision</span>
+<b>DGP</b> (how the data arise) → <b>estimation</b> (PROC MIXED, PROC NLMIXED, RStan) → <b>optimization</b> (expected profit or expected utility) → recommendation.</div>
+<div class="prof"><span class="lbl">In class (Aug 31)</span>"One of the things we're trying to teach is the way you do research ... you have a theoretical model that sort of sets up your hypothesis. And then you have an empirical model." A reviewed paper jumped from Mexican weather straight to Canadian vegetable consumption and skipped the chain weather → yield → prices → trade → retail prices → consumption. "We're not gonna do that."</div>
+
+<h3>Syllabus outline</h3>
+<div class="scrollx"><table class="t"><thead><tr><th>Part</th><th>Topics</th><th>In this app</th></tr></thead><tbody>
+<tr><td>I. The primal approach</td><td>ANOVA models, expected-profit maximization, specifying objective functions, random effects, stochastic plateau functions. <b>Exam 1</b> (Sep 23)</td><td>Chapters 1–4</td></tr>
+<tr><td>II. Decision making under risk</td><td>Theory of risk, mean–variance, stochastic dominance, direct expected-utility maximization, numerical integration. <b>Exam 2</b></td><td>Chapters 6–8</td></tr>
+<tr><td>III. Other production function methods</td><td>Bayesian estimation, spatial models, prelim-style questions</td><td>Chapter 5 (Bayesian, taught Sep 21–30) and Chapter 10</td></tr>
+<tr><td>IV. Special topics</td><td>Frontier functions, duality, estimation in R, copulas, credit risk, machine learning</td><td>Chapter 10 (preview)</td></tr>
+<tr><td>V. Presentations</td><td>Student term papers</td><td>Chapter 9</td></tr>
+</tbody></table></div>
+
+<h3>Grading and logistics</h3>
+<ul class="pts">
+<li>Exams 50%, homework and quizzes 30%, term paper 20%. A 85–100, B 70–85, C 50–70.</li>
+<li>Exams are closed book, long and challenging; make-ups are harder. <b>Final exam: Wednesday, December 9, 8:00–9:50 am.</b></li>
+<li>Weekly homework (mostly with Claude Code) with program statements and output; a 20-point in-class quiz is part of each homework. Late homework loses 10 points.</li>
+<li>Term paper: journal-style, empirical, about 20–30 pages, following "Observations on the Journal Publication Process."</li>
+</ul>
+
+<h3>Using AI as a learning tool</h3>
+<div class="prof"><span class="lbl">In class (Sep 2)</span>"I've got to ask it what it did and why. I've got to ask it to recheck it. I've got to ask it to explain this part to me." Useful prompts: "What did my professor want me to learn from this assignment?" and "What are some likely quiz questions?"</div>
+<div class="clarify"><span class="lbl">Clarifying</span>The quizzes test whether <i>you</i> understand the homework. Running Claude Code without reading what it did is the most common reason for low quiz scores. After every assignment, use this app's one-line review for the matching chapter.</div>
+</section>
+
+<section data-s="examples">
+<h3>Quick checks</h3>
+<details class="sol"><summary>What is the difference between the primal and dual approach?</summary><div class="body"><p>The <b>primal</b> approach estimates the production function \(y=f(x)\) directly, usually from designed experiments, and then optimizes. The <b>dual</b> approach estimates profit or cost functions of prices from observational data and recovers technology through duality (Hotelling's and Shephard's lemmas). This course emphasizes the primal approach because OSU students usually work with agronomists and animal scientists who run experiments.</p></div></details>
+<details class="sol"><summary>Name the three parts of every empirical exercise in the course.</summary><div class="body"><p><span class="ans">DGP → estimation → optimization</span></p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Mindset" data-by="StatQuest with Josh Starmer" href="https://www.youtube.com/watch?v=NF5_btOaCig">Using Linear Models for t-tests and ANOVA, Clearly Explained</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="1"><div class="stem">Which approach does this course emphasize?</div><ol><li>The dual approach with profit functions</li><li>The primal approach with production functions from experiments</li><li>Computable general equilibrium</li><li>Pure linear programming</li></ol><div class="why">The syllabus says the primal approach is emphasized rather than the dual approach.</div></div>
+<div class="q" data-a="2"><div class="stem">What share of the final grade comes from exams?</div><ol><li>30%</li><li>20%</li><li>50%</li><li>70%</li></ol><div class="why">Exams 50%, homework and quizzes 30%, term paper 20%.</div></div>
+<div class="q" data-a="0"><div class="stem">In the research chain, what comes immediately before the optimization problem?</div><ol><li>Estimation of the DGP</li><li>The literature review</li><li>The abstract</li><li>Hypothesis testing of the abstract</li></ol><div class="why">You write the DGP, estimate it, and then embed the estimate in an optimization problem.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Four course objectives</div><div class="b">Estimate production functions; specify a DGP; specify an objective function; find optimal inputs/outputs with and without risk aversion.</div></div>
+<div class="fc"><div class="f">Final exam date</div><div class="b">Wednesday, December 9, 8:00–9:50 am</div></div>
+<div class="fc"><div class="f">Primal vs dual</div><div class="b">Primal: estimate y = f(x) from experiments. Dual: estimate profit/cost functions of prices from observational data.</div></div>
+</section>
+</template>
+
+<template data-lesson="c0l2" data-ch="0" data-title="Which method do I use? The decision flowchart" data-src="Lecture Oct 2 · notebook IMG_2656–2657" data-yt="decision analysis under risk agricultural economics">
+<section data-s="learn">
+<h3>The big picture</h3>
+<p>On October 2 the professor drew a flowchart so you could see where every method in the course fits. "I'm a big picture person." Learn it early; each chapter of this app is one box.</p>
+<div class="scrollx"><table class="t"><thead><tr><th>Step</th><th>Question</th><th>Answer → tool</th></tr></thead><tbody>
+<tr><td>1</td><td>Are data available?</td><td>No → subjective elicitation, expert opinion (Delphi), surveys. Yes → step 2.</td></tr>
+<tr><td>2</td><td>Observational or experimental data?</td><td>Observational → duality (profit and cost functions). Experimental → primal production functions: ANOVA, regression, logit, probit, Tobit, spatial models.</td></tr>
+<tr><td>3</td><td>Does risk matter?</td><td>No → expected profit: budgeting (discrete), calculus (analytical), linear/nonlinear optimization. Yes → step 4.</td></tr>
+<tr><td>4</td><td>Are the choices discrete?</td><td>Yes → step 5. No (continuous) → step 7.</td></tr>
+<tr><td>5</td><td>First-degree stochastic dominance?</td><td>Yes → stop. No → second-degree SD or mean–variance.</td></tr>
+<tr><td>6</td><td>SSD or E-V decides it?</td><td>Yes → stop. No → SDRF or SERF.</td></tr>
+<tr><td>7</td><td>Normality?</td><td>Yes → quadratic programming. No → direct expected-utility maximization (also MOTAD / Target MOTAD).</td></tr>
+</tbody></table></div>
+<div class="exam"><span class="lbl">Scope</span>"Direct expected utility maximization is part of the class; quadratic programming is not." MOTAD and Target MOTAD belong to advanced math programming and are not covered.</div>
+
+<h3>Why each branch</h3>
+<ul class="pts">
+<li><b>No data:</b> MBA courses teach decisions without data; agricultural economists are usually the analysts with data. When probabilities are missing, write down your own guesses and ask an expert to correct them: "people are really a lot better to tell you when you're wrong." A formal <b>Delphi</b> process asks several experts and iterates to a group opinion.</li>
+<li><b>Observational data → duality.</b> Kansas State (KFMA farm records) leans on duality. The professor distrusts estimated profit functions: little price variation, highly correlated prices, unbelievable answers. Cost functions sometimes work.</li>
+<li><b>FSD</b> applies to everyone who prefers more to less: "you really can't beat that." <b>SSD</b> and E-V apply to risk-averse people. If those fail, add assumptions: <b>SDRF</b> (Jack Meyer) bounds risk aversion; <b>SERF</b> (James Richardson) picks a utility form.</li>
+</ul>
+<div class="prof"><span class="lbl">In class</span>"I dislike it so much when people say ... people apply extra nitrogen on their fields because of risk aversion ... They do that because it's the expected profit maximizing solution under uncertainty when you have this asymmetric response." (You will see why in Chapter 3.)</div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>A farmer picks one of three cotton varieties using a table of incomes by weather state. Which branch?</summary><div class="body"><p>Data exist, risk matters, and the choice is <b>discrete</b>, so start with FSD, then SSD / E-V, then SDRF/SERF if needed (Chapter 7).</p></div></details>
+<details class="sol"><summary>A producer chooses a nitrogen rate with a nonnormal yield distribution and a CARA utility function. Which branch?</summary><div class="body"><p>Continuous choice, risk matters, not normal → <span class="ans">direct expected-utility maximization</span> with numerical integration (Chapter 8).</p></div></details>
+<details class="sol"><summary>You have farm-record data on prices paid and received but no experiments. Which branch?</summary><div class="body"><p>Observational data → <b>duality</b> (profit or cost functions).</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Decision theory" data-by="Linda Williams" href="https://www.youtube.com/watch?v=FhJe97kllHU">Decision Theory: Expected Value of Perfect Information or EVPI</a>
+<a class="vid" data-tag="Risk basics" data-by="BurkeyAcademy" href="https://www.youtube.com/watch?v=Hr0K6K16PQs">Risk Aversion and Expected Utility Basics</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="3"><div class="stem">Choices are continuous, risk matters and outcomes are not normal. Which method?</div><ol><li>First-degree stochastic dominance</li><li>Quadratic programming</li><li>Partial budgeting</li><li>Direct expected-utility maximization</li></ol><div class="why">Step 7: no normality → direct expected-utility maximization.</div></div>
+<div class="q" data-a="0"><div class="stem">What is the Delphi approach?</div><ol><li>Iteratively collecting and revising expert opinions into a group judgment</li><li>A numerical integration rule</li><li>A dual cost function</li><li>A type of stochastic dominance</li></ol><div class="why">It is used when data are not available.</div></div>
+<div class="q" data-a="1"><div class="stem">Which assumption does FSD require?</div><ol><li>Risk aversion</li><li>Only that more is preferred to less</li><li>Normality</li><li>Quadratic utility</li></ol><div class="why">FSD needs only u′ &gt; 0, which is why it applies to everybody.</div></div>
+<div class="q" data-a="2"><div class="stem">Which of these is NOT covered in the class?</div><ol><li>Direct expected-utility maximization</li><li>SERF</li><li>Quadratic programming and MOTAD</li><li>Second-degree stochastic dominance</li></ol><div class="why">The professor said quadratic programming and MOTAD are advanced math programming topics outside this class.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">First question of the decision flowchart</div><div class="b">Are data available? If not: subjective elicitation, expert opinion, Delphi.</div></div>
+<div class="fc"><div class="f">Observational data lead to …</div><div class="b">Duality: profit and cost functions</div></div>
+<div class="fc"><div class="f">Discrete risky choice: order of criteria</div><div class="b">FSD → SSD / mean–variance → SDRF / SERF</div></div>
+<div class="fc"><div class="f">Continuous risky choice without normality</div><div class="b">Direct expected-utility maximization (numerical integration)</div></div>
+</section>
+</template>
+
+<template data-review="0">
+<div class="ol"><div class="oq">Who teaches AGEC 6403 and what approach does it emphasize?</div><div class="oa">Dr. B. Wade Brorsen; the primal approach plus decision making under risk.</div></div>
+<div class="ol"><div class="oq">List the four course objectives.</div><div class="oa">Estimate production functions from experiments; specify a DGP; specify an objective function; find optimal inputs/outputs with and without risk aversion.</div></div>
+<div class="ol"><div class="oq">What are the three steps in every empirical exercise?</div><div class="oa">DGP → estimation → optimization.</div></div>
+<div class="ol"><div class="oq">How is the course grade split?</div><div class="oa">Exams 50%, homework and quizzes 30%, term paper 20%.</div></div>
+<div class="ol"><div class="oq">When is the final exam?</div><div class="oa">Wednesday, December 9, 8:00–9:50 am.</div></div>
+<div class="ol"><div class="oq">What do you use when no data are available?</div><div class="oa">Subjective elicitation, expert opinion, Delphi, surveys.</div></div>
+<div class="ol"><div class="oq">Observational data point you toward which method?</div><div class="oa">Duality: profit and cost functions.</div></div>
+<div class="ol"><div class="oq">Experimental data point you toward which method?</div><div class="oa">Primal production functions: ANOVA, regression, logit, probit, Tobit, spatial models.</div></div>
+<div class="ol"><div class="oq">If risk does not matter, what tools solve the problem?</div><div class="oa">Expected profit: budgeting, calculus, linear or nonlinear optimization.</div></div>
+<div class="ol"><div class="oq">For discrete risky choices, which criterion do you try first?</div><div class="oa">First-degree stochastic dominance.</div></div>
+<div class="ol"><div class="oq">What do you use when FSD and SSD fail to rank alternatives?</div><div class="oa">SDRF or SERF.</div></div>
+<div class="ol"><div class="oq">Continuous risky choice with normal outcomes uses what? Without normality?</div><div class="oa">Quadratic programming; direct expected-utility maximization.</div></div>
+<div class="ol"><div class="oq">Which flowchart tools are outside the class?</div><div class="oa">Quadratic programming, MOTAD and Target MOTAD.</div></div>
+<div class="ol"><div class="oq">Why does extra nitrogen get applied, according to the professor?</div><div class="oa">Expected profit maximization under an asymmetric (plateau) response, not risk aversion.</div></div>
+<div class="ol"><div class="oq">How should you use AI for learning in this class?</div><div class="oa">Ask it what it did and why, have it recheck, ask it to explain parts and to suggest likely quiz questions.</div></div>
+</template>
+
+<!-- ===================== CHAPTER 1 ===================== -->
+<template data-chapter="1" data-part="I. The primal approach" data-title="Writing the data generating process" data-dates="Weeks 1–2 · Sep 4 · Sep 14 · Sep 18 · Assignments 1–3" data-color="1"></template>
+
+<template data-lesson="c1l1" data-ch="1" data-title="ANOVA, dummy variables and matrix form" data-src="Assignments 1 and 3 · Sep 4 lecture · Sep 14 quiz review" data-yt="ANOVA model dummy variable regression matrix form">
+<section data-s="learn">
+<h3>What a DGP is</h3>
+<p>A <b>data generating process</b> states how each observation arises: the mean function, every index, every random component, its distribution, and how the random parts relate (usually independent). An <b>empirical model</b> estimates it; a <b>decision model</b> uses the estimate.</p>
+<div class="prof"><span class="lbl">In class (Sep 2)</span>"Very important to me ... that you know how to write a data generating process." Exam 1: a DGP question "you can just count on that."</div>
+
+<h3>Three ways to write the same model</h3>
+<p>Assignment 3 asked for the DGP three ways. Example: treatment \(i=1,\dots,I\), year \(t=1,\dots,T\), replication \(r\).</p>
+<div class="formula"><span class="lbl">1. ANOVA (effects) format</span>
+\[y_{itr}=\mu+\alpha_i+u_t+b_{r(t)}+\varepsilon_{itr},\]
+\(u_t\sim N(0,\sigma_u^2)\), \(b_{r(t)}\sim N(0,\sigma_b^2)\), \(\varepsilon_{itr}\sim N(0,\sigma_e^2)\), all mutually independent, with \(\sum_i\alpha_i=0\) or one \(\alpha_i\) set to zero.</div>
+<div class="formula"><span class="lbl">2. Regression with dummy variables</span>
+\[y_{itr}=\beta_0+\sum_{k=2}^{I}\beta_k D_{ik}+u_t+b_{r(t)}+\varepsilon_{itr},\qquad D_{ik}=1(i=k).\]</div>
+<div class="formula"><span class="lbl">3. Matrix notation</span>
+\[\mathbf y=\mathbf X\boldsymbol\beta+\mathbf Z\mathbf u+\boldsymbol\varepsilon,\qquad \operatorname{var}(\mathbf y)=\mathbf V=\mathbf Z\mathbf G\mathbf Z'+\mathbf R.\]
+Vectors and matrices in bold; variables italic.</div>
+<div class="clarify"><span class="lbl">Clarifying: what \(\alpha_i\) is</span>"\(\gamma_n\) is not the nitrogen level. It is a fixed effect for the nitrogen level ... equivalent to the dummy variable ... that number is the coefficient." You never plug 0, 20, 40 lb into an ANOVA effect; you would in a regression on \(N\).</div>
+
+<h3>The panel (dummy-variable) model from weeks 1–2</h3>
+<div class="formula"><span class="lbl">Individual intercepts</span>
+\[y_{it}=\bar\beta_1+\mu_i+\sum_{k=2}^{K}\beta_k X_{kit}+e_{it},\quad E(e_{it})=0,\ E(\mathbf e\mathbf e')=\sigma^2\mathbf I_{NT}.\]
+Matrix form: \(\mathbf Y=[\mathbf I_N\otimes \mathbf j_T\ \vdots\ \mathbf X_s][\boldsymbol\beta_1'\ \boldsymbol\beta_s']'+\mathbf e\), where \(\mathbf j_T\) is a \(T\times1\) vector of ones and \(\otimes\) is the Kronecker product. Parameters: \(N+K-1\) betas and one \(\sigma^2\).</div>
+<div class="clarify"><span class="lbl">Clarifying: matrices are just stacked equations</span>"The memorizers find it harder than the learners." Decide how to stack observations (all \(t\) for individual 1 first, or all individuals for year 1 first), then build the right side so each row reproduces one scalar equation. Kronecker products, vectors of ones and identity matrices appear only to do that bookkeeping.</div>
+
+<h3>Counting parameters and the dummy trap</h3>
+<ul class="pts">
+<li>With an intercept and \(I\) treatments you need \(I-1\) dummies (SAS sets the last level to zero).</li>
+<li>"I think it's goofy to leave out \(\beta_1\), but it's not wrong" (laying-hens example). Without an intercept you can keep all \(I\) dummies.</li>
+<li>Quiz 1: two treatments, no replication, an intercept plus two effects → <b>singular</b>: as many parameters as observations, so the residual variance cannot be estimated.</li>
+<li>Regression is the word for observational data; ANOVA for designed experiments.</li>
+</ul>
+
+<h3>Adding replications and covariates</h3>
+<ul class="pts">
+<li>Replication adds an \(r\) subscript; blocking factors are usually random effects.</li>
+<li>A continuous covariate (average initial weight) enters like a regression coefficient. It is still a fixed effect, just not a CLASS variable.</li>
+<li>Averaging over blocks first: "There's no theoretical advantage to disaggregate data in this case, because we have no explanatory variable at the block level" (exception: modeling heteroskedasticity across reps).</li>
+</ul>
+</section>
+
+<section data-s="examples">
+<h3>Worked DGPs from class</h3>
+<details class="sol"><summary>Assignment 1: wheat varieties (10) across 26 site-years. Write the DGP the professor wrote.</summary><div class="body"><p>\(y_{it}=\delta_i+\varepsilon_{it}\), \(\varepsilon_{it}\sim N(0,\sigma^2)\), where \(y_{it}\) is yield of variety \(i\) in site-year \(t\) and \(\delta_i\) is the mean of variety \(i\). Estimated with variety dummies and no intercept. Adding site-year as a fixed effect gives \(y_{it}=\delta_i+\gamma_t+\varepsilon_{it}\).</p></div></details>
+<details class="sol"><summary>Six nitrogen levels and 44 years. (a) ANOVA with random years. (b) Quadratic. (c) Optimization.</summary><div class="body">
+<p>(a) \(y_{nt}=\mu+\gamma_n+\alpha_t+\varepsilon_{nt}\), \(\alpha_t\sim N(0,\sigma_\alpha^2)\), \(\varepsilon_{nt}\sim N(0,\sigma_\varepsilon^2)\), \(\operatorname{cov}(\alpha_t,\varepsilon_{nt})=0\). N level fixed, year random.</p>
+<p>(b) \(y_{nt}=\beta_0+\beta_1N_n+\beta_2N_n^2+\alpha_t+\varepsilon_{nt}\) with the same random terms. Nitrogen varies across plots within a year, so \(N\) needs its own subscript \(n\), not \(t\).</p>
+<p>(c) \(\max_{N\ge0}\ pE(y)-rN\) with \(E(y)=\beta_0+\beta_1N+\beta_2N^2\) → \(N^*=(r/p-\beta_1)/(2\beta_2)\) when \(\beta_2&lt;0\).</p></div></details>
+<details class="sol"><summary>Laying hens: 1–5 hens per cage, total eggs per cage over 45 days. Write the dummy-variable DGP.</summary><div class="body"><p>\(y_a=\beta_0+\sum_{i=2}^{5}\beta_iD_{ai}+\varepsilon_a\), \(D_{ak}=1\) if cage \(a\) has \(k\) hens and 0 otherwise, \(\varepsilon_a\sim N(0,\sigma^2)\). The dummy must carry the cage subscript \(a\). In SAS: <code>dummy1 = (hens = 1);</code></p></div></details>
+<details class="sol"><summary>Assignment 3: 16 cover-crop systems, RCBD with 4 blocks, 4 crop years. Write the ANOVA DGP.</summary><div class="body"><p>\(y_{sbt}=\mu+\tau_s+\beta_b+\gamma_t+\varepsilon_{sbt}\) where \(\tau_s\) is the fixed effect of system \(s=1,\dots,16\), \(\beta_b\sim N(0,\sigma_\beta^2)\) the block effect, \(\gamma_t\sim N(0,\sigma_\gamma^2)\) the crop-year effect, \(\varepsilon_{sbt}\sim N(0,\sigma^2)\), all independent. The quiz comment "you need another subscript; is r rep?" is about forgetting the block index.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Start here" data-by="jbstatistics" href="https://www.youtube.com/watch?v=QUQ6YppWCeg">Introduction to One-Way ANOVA</a>
+<a class="vid" data-tag="ANOVA as regression" data-by="StatQuest with Josh Starmer" href="https://www.youtube.com/watch?v=NF5_btOaCig">Using Linear Models for t-tests and ANOVA, Clearly Explained</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="1"><div class="stem">In \(y_{nt}=\mu+\gamma_n+\alpha_t+\varepsilon_{nt}\), what is \(\gamma_n\)?</div><ol><li>The nitrogen rate in lb/acre</li><li>The fixed effect (coefficient) of nitrogen level \(n\)</li><li>A random year effect</li><li>The error term</li></ol><div class="why">It plays the role of a dummy coefficient; the rate itself is not plugged in.</div></div>
+<div class="q" data-a="2"><div class="stem">A model with two treatments, one observation each, an intercept and two treatment effects is …</div><ol><li>Overidentified</li><li>Heteroskedastic</li><li>Singular</li><li>Nested</li></ol><div class="why">More parameters than can be identified from the cells; residual variance has zero degrees of freedom.</div></div>
+<div class="q" data-a="0"><div class="stem">With an intercept and 5 treatments, how many treatment dummies?</div><ol><li>4</li><li>5</li><li>6</li><li>1</li></ol><div class="why">\(I-1\) dummies avoid the dummy-variable trap.</div></div>
+<div class="q" data-a="3"><div class="stem">Which SAS statement tells PROC MIXED which variables are discrete?</div><ol><li>MODEL</li><li>RANDOM</li><li>PARMS</li><li>CLASS</li></ol><div class="why">Assignment 1 quiz: <code>class variety environment;</code></div></div>
+<div class="q" data-a="1"><div class="stem">What does \(\mathbf j_T\) denote in \(\mathbf I_N\otimes\mathbf j_T\)?</div><ol><li>The identity matrix</li><li>A \(T\times1\) vector of ones</li><li>The error vector</li><li>A vector of time trends</li></ol><div class="why">The Kronecker product with \(\mathbf j_T\) repeats each individual's intercept dummy over its \(T\) periods.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Parts of a complete DGP</div><div class="b">Mean function, all indices and their ranges, every random term with its distribution, independence assumptions, every symbol defined.</div></div>
+<div class="fc"><div class="f">Three ways to write a DGP</div><div class="b">ANOVA (effects), regression with dummy variables, matrix notation</div></div>
+<div class="fc"><div class="f">Why is a no-replication two-treatment model singular?</div><div class="b">Parameters equal observations; residual variance cannot be estimated.</div></div>
+<div class="fc"><div class="f">ANOVA vs regression (terminology)</div><div class="b">ANOVA for designed experiments; regression for observational data.</div></div>
+<div class="fc"><div class="f">Mixed model covariance</div><div class="b">\(\mathbf V=\mathbf Z\mathbf G\mathbf Z'+\mathbf R\)</div></div>
+</section>
+</template>
+
+<template data-lesson="c1l2" data-ch="1" data-title="Fixed vs random effects, error components and BLUPs" data-src="Weeks 1–2 notebook · Assignment 2 · Sep 2 and Sep 18 lectures" data-yt="fixed effects vs random effects BLUP shrinkage mixed model">
+<section data-s="learn">
+<h3>Same equation, different assumptions</h3>
+<p>Fixed vs random is a change in <b>assumptions</b>, not in the model equation. In the error-components model the individual effects get a distribution:</p>
+<div class="formula"><span class="lbl">Error-components model</span>
+\[E(\mu_i)=0,\quad E(\mu_i^2)=\sigma_\mu^2,\quad E(\mu_i\mu_j)=0\ (i\ne j),\]
+\[\boldsymbol\Phi_i=\sigma_\mu^2\mathbf j_T\mathbf j_T'+\sigma_e^2\mathbf I_T,\qquad \boldsymbol\Phi=\mathbf I_N\otimes\boldsymbol\Phi_i,\]
+\[\hat{\boldsymbol\beta}_{GLS}=(\mathbf X'\boldsymbol\Phi^{-1}\mathbf X)^{-1}\mathbf X'\boldsymbol\Phi^{-1}\mathbf Y.\]
+\(\boldsymbol\Phi_i\) has \(\sigma_e^2+\sigma_\mu^2\) on the diagonal and \(\sigma_\mu^2\) off the diagonal: observations that share an effect are correlated.</div>
+<p>PROC MIXED estimates variance components by <b>REML</b> (restricted maximum likelihood), which corrects the downward small-sample bias of ML variance estimates (a degrees-of-freedom correction).</p>
+
+<h3>Why is year usually random? (old exam question)</h3>
+<ol class="pts">
+<li><b>Not controlled by the researcher.</b> "The one I'm really looking for is that it's not controlled by the researcher. And therefore, it's random." Nobody controls the weather.</li>
+<li>You want statements about <b>all years</b> (the distribution of years), not just the years observed.</li>
+<li>Higher power and smaller standard errors (more efficient).</li>
+</ol>
+<div class="warn"><span class="lbl">Pitfall</span>A perennial like switchgrass takes 3–4 years to reach potential, so age is confounded with year. Treating year as random there gives standard errors that are falsely small.</div>
+
+<h3>Why random effects for variety, which the researcher <i>does</i> control?</h3>
+<div class="prof"><span class="lbl">In class (Sep 2)</span>"Nobody got that right on the quiz." It <b>depends on the goal</b>: Assignment 1 wanted paired comparisons of one variety with another → fixed effects. Assignment 2 wanted the top five varieties when varieties had very different numbers of site-years → random variety effects (BLUPs, the Bayesian shrinkage estimator). If the expected yield goes into an optimization model, "you really ought to be using the Bayesian shrinkage adjustment."</div>
+<div class="formula"><span class="lbl">Shrinkage (BLUP intuition)</span>
+\[\hat u_i^{BLUP}=\frac{\sigma_u^2}{\sigma_u^2+\sigma_e^2/n_i}\,(\bar y_i-\bar y).\]
+A variety seen in few site-years (\(n_i\) small) is pulled strongly toward the grand mean; one seen often keeps most of its raw difference.</div>
+<div class="clarify"><span class="lbl">Clarifying: the Assignment 2 ranking flip</span>Breck had 11 site-years with an unadjusted mean of 65.45 bu; Showdown had 46 site-years and 58.61 bu. Breck's high raw mean rests on few observations, so its BLUP shrinks much more. Rankings by raw means and by BLUPs differ because of unequal numbers of observations.</div>
+
+<h3>Reading PROC MIXED output (handout)</h3>
+<ul class="pts">
+<li><b>Covariance structure "Diagonal"</b>: no off-diagonal covariance, no heteroskedasticity.</li>
+<li><b>Estimation method REML</b>; <b>"Profile"</b>: the residual variance is profiled out of the likelihood.</li>
+<li><b>Columns in X</b> = levels + intercept (last level set to zero).</li>
+<li><b>−2 Res Log Likelihood</b>: what you need for a likelihood-ratio test. <b>AIC, AICC, BIC</b>: smaller is better.</li>
+<li>Intercept = LS mean of the reference level; other estimates are differences from it. Type 3 test: F test that all treatment means are equal.</li>
+</ul>
+<div class="warn"><span class="lbl">Common mistake</span>REML likelihoods are comparable only between models with the <b>same fixed effects</b>. Compare different fixed-effect specifications with ML.</div>
+
+<h3>A variance on the boundary (Assignment 2, Q3)</h3>
+<p>With only four crop years, a variance component can be estimated at exactly 0: the estimate is on the <b>boundary</b> of the parameter space. "How much can be learned about a variance from four observations?" Very little. Report it honestly to a referee: the crop-year variance is poorly identified.</p>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Write the Assignment 2 model with variety random too (three variance components).</summary><div class="body"><p>\(y_{vst}=\mu+a_v+s_{s}+\varepsilon_{vst}\), \(a_v\sim N(0,\sigma_a^2)\) random variety effect, \(s_s\sim N(0,\sigma_s^2)\) random site-year effect, \(\varepsilon\sim N(0,\sigma_e^2)\), all independent. (If crop year is also random, add \(c_t\sim N(0,\sigma_c^2)\).)</p></div></details>
+<details class="sol"><summary>Which should you use to estimate expected profit of the top variety: unadjusted means or BLUPs? Why?</summary><div class="body"><p>BLUPs. The top raw mean is biased upward (winner's curse) especially when based on few site-years; shrinkage corrects it, giving a better expected-yield input to the profit calculation.</p></div></details>
+<details class="sol"><summary>Give three reasons year is random. Which one does the professor most want?</summary><div class="body"><p>Not controlled by the researcher (the main one); inference about all years; higher power / lower standard errors.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Start here" data-by="BurkeyAcademy" href="https://www.youtube.com/watch?v=ySTb5Nrhc8g">Fixed Effects vs Random Effects</a>
+<a class="vid" data-tag="Intuition" data-by="Ben Lambert" href="https://www.youtube.com/watch?v=EbdBHJYbOrg">How does Random Effects work?</a>
+<a class="vid" data-tag="Mixed models" data-by="Methods in Experimental Ecology I" href="https://www.youtube.com/watch?v=-4K-kKXNths">Intro to Mixed Effect Models</a>
+<a class="vid" data-tag="BLUP shrinkage" data-by="Vikas Mangal" href="https://www.youtube.com/watch?v=InRVHtu0SUg">Shrinkage in BLUP: BLUP vs Simple Means</a>
+<a class="vid" data-tag="Pooling" data-by="Peter Blenis" href="https://www.youtube.com/watch?v=RBf5YXH8KCo">Pooling and shrinkage</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="0"><div class="stem">The main reason the professor wants for treating year as random:</div><ol><li>It is not controlled by the researcher</li><li>It makes the model nonlinear</li><li>SAS requires it</li><li>It always lowers AIC</li></ol><div class="why">Weather is not controlled. Inference to all years and efficiency are secondary reasons.</div></div>
+<div class="q" data-a="2"><div class="stem">Why use random variety effects in Assignment 2?</div><ol><li>Varieties are not controlled by the researcher</li><li>Fixed effects cannot be estimated</li><li>Unequal numbers of site-years make shrinkage (BLUP) better for picking the top varieties</li><li>To avoid the CLASS statement</li></ol><div class="why">It depends on the goal; ranking with unbalanced data favors BLUPs.</div></div>
+<div class="q" data-a="1"><div class="stem">Off-diagonal elements of \(\boldsymbol\Phi_i=\sigma_\mu^2\mathbf j\mathbf j'+\sigma_e^2\mathbf I\) equal:</div><ol><li>0</li><li>\(\sigma_\mu^2\)</li><li>\(\sigma_e^2\)</li><li>\(\sigma_\mu^2+\sigma_e^2\)</li></ol><div class="why">Two observations of the same individual share \(\mu_i\), so their covariance is \(\sigma_\mu^2\).</div></div>
+<div class="q" data-a="3"><div class="stem">In PROC MIXED output, which line do you use for a likelihood-ratio test?</div><ol><li>Columns in X</li><li>Type 3 F test</li><li>AICC</li><li>−2 Res Log Likelihood</li></ol><div class="why">LR = difference in −2 log likelihoods (same fixed effects under REML).</div></div>
+<div class="q" data-a="1"><div class="stem">A variety observed in only 3 site-years has a raw mean far above average. Its BLUP will be:</div><ol><li>Exactly its raw mean</li><li>Pulled strongly toward the grand mean</li><li>Pushed further from the mean</li><li>Undefined</li></ol><div class="why">Shrinkage weight \(\sigma_u^2/(\sigma_u^2+\sigma_e^2/n_i)\) is small when \(n_i\) is small.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Fixed vs random: what changes?</div><div class="b">The assumptions (a distribution for the effects), not the equation.</div></div>
+<div class="fc"><div class="f">Three reasons year is random</div><div class="b">Not controlled by researcher; inference to all years; more power / lower SEs.</div></div>
+<div class="fc"><div class="f">REML</div><div class="b">Restricted ML: corrects small-sample downward bias of variance estimates; compare only models with the same fixed effects.</div></div>
+<div class="fc"><div class="f">BLUP shrinkage weight</div><div class="b">\(\sigma_u^2/(\sigma_u^2+\sigma_e^2/n_i)\)</div></div>
+<div class="fc"><div class="f">Random vs fixed for variety?</div><div class="b">"Depends on goal": paired comparisons → fixed; ranking with unbalanced data → random (BLUP).</div></div>
+</section>
+</template>
+
+<template data-lesson="c1l3" data-ch="1" data-title="Notation rules and finding equation errors" data-src="Sep 4 · Sep 14 · Sep 18 lectures · practice handouts" data-yt="how to write equations in a research paper notation">
+<section data-s="learn">
+<h3>The rules the professor grades on</h3>
+<ol class="pts">
+<li><b>One symbol, one definition.</b> "That is a really big mistake. It's also a very common mistake." Using \(k\) as both a location index and a summation index, or \(i\) as both observation and summation index, collapses the sum. "Considered a major blunder."</li>
+<li>Define every symbol, including every subscript and its range.</li>
+<li>Symbols in the definitions must match the equation exactly (\(SR_{it}\) vs \(SR_{itk}\); \(\varepsilon\) vs \(v\)).</li>
+<li>State the distribution of every random term, and state that random terms are independent. Prefer "\(\sim N(0,\sigma^2)\)" (it takes less space).</li>
+<li>Variables and subscripts in italics; vectors and matrices in bold; numbers never italic; function names (cos, sin, ln, min) roman.</li>
+<li>The equation is part of a sentence: no colon before it, normal punctuation, a period at the end. A comma after an equation is fine.</li>
+<li>Equation numbers on the right.</li>
+<li>Write definitions as sentences in text format, not bullet lists ("I want a text format").</li>
+<li>Multi-letter names like \(NR\) can be read as \(N\times R\); single symbols are safer (\(\pi\) for net return). Word names (ADG, System) are acceptable in applied journals.</li>
+</ol>
+<div class="prof"><span class="lbl">In class</span>"It's a lot easier to find errors than it is to write something correctly." One notation-error question appears on every old exam.</div>
+
+<h3>Exam pattern: "Find five errors"</h3>
+<p>Sentence from the practice sheet (cattle weight gain): "...where \(ADG_{ijkb}\) is the average daily gain for the \(i\)th animal under the \(j\)th treatment and \(k\)th hormone in the \(B\)th pasture block, \(\alpha_1,\alpha_2\) and \(\beta_j\) are parameters, \(T_{ijb}\) is a dummy..., \(B\) is the block random effect, \(B=1\) to 5, and \(\varepsilon_{ijkB}\) is a random error with \(\nu_{ijkb}\sim N(0,\sigma_\varepsilon^2)\)."</p>
+<p>Errors found in class: colon before the equation; italic numbers; \(j\) used for two items; \(\alpha_2\) defined but absent from the equation; subscripts do not match (\(ijkb\) vs \(ijb\)); \(\varepsilon\) vs \(\nu\); block random effect has no distribution; Color needs a consistent subscript; \(B\) used both as the effect and as the index.</p>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Solar radiation model: \(SR_{itk}=\beta_{0k}+\sum_{k=1}^{4}\beta_{1ik}\cos(2\pi kt/365)+\beta_{2ik}\sin(2\pi kt/365)+\gamma_{tk}+\varepsilon_{itk}\). Find at least five errors.</summary><div class="body"><ul class="pts">
+<li>\(k\) has two definitions (location and summation index): the biggest error.</li>
+<li>The definitions use \(SR_{itj}\), the equation \(SR_{itk}\).</li>
+<li>\(t\) is not explained; \(\gamma_{tk}\) is not explained or given a distribution.</li>
+<li>The ellipsis "1,2, ...,24" is written with two dots in places; "where is normally distributed" is ungrammatical; two "and"s.</li>
+<li>\(\beta_0\) should carry \(i\) (hour) like the other betas.</li>
+<li>cos and sin should be roman, not italic.</li>
+<li>Random effects' correlation unspecified; equation number should be on the right; "as follows," should not end in a comma before a display.</li>
+<li>Deeper: one cycle should be within the day and one seasonal, but 365 alone gives only a seasonal cycle.</li></ul></div></details>
+<details class="sol"><summary>Grazing model on an old exam used "System\(_t\)". What did the professor say?</summary><div class="body"><p>"System\(_t\)" is not the grazing system itself; it is the fixed (or random) <i>effect</i> of grazing system \(t\). Word names are fine, but say what they are. Also: period at the end, matching subscripts on both sides, no double specification, say the random terms are mutually independent.</p></div></details>
+</section>
+
+<section data-s="watch">
+<p class="muted">No single video matches the course's notation rules; the rules above come straight from class. Use the search link for general guidance on typesetting equations.</p>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="2"><div class="stem">Which is the "major blunder" in writing a DGP?</div><ol><li>Using Greek letters</li><li>Putting the equation number on the right</li><li>Giving one symbol two definitions</li><li>Writing \(\sim N(0,\sigma^2)\)</li></ol><div class="why">Reusing an index (e.g., \(i\) for both observation and summation) changes the meaning of the equation.</div></div>
+<div class="q" data-a="0"><div class="stem">How should "cos" appear in a typeset equation?</div><ol><li>Roman (upright), because it is a function name</li><li>Italic, like variables</li><li>Bold, like a vector</li><li>In quotation marks</li></ol><div class="why">Function names are roman; variables are italic.</div></div>
+<div class="q" data-a="3"><div class="stem">What punctuation goes right before a displayed equation that continues the sentence "The model is"?</div><ol><li>A colon</li><li>A semicolon</li><li>"as follows:"</li><li>None; punctuate as normal text</li></ol><div class="why">"No colon before an equation." The equation is part of the sentence.</div></div>
+<div class="q" data-a="1"><div class="stem">Where do equation numbers go in our journals?</div><ol><li>Left</li><li>Right</li><li>Above the equation</li><li>In the footnote</li></ol><div class="why">Word puts them on the left by default; most agricultural economics journals want them on the right.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Italic vs roman in math</div><div class="b">Variables and subscripts italic; numbers and function names (cos, ln, min) roman; vectors/matrices bold.</div></div>
+<div class="fc"><div class="f">Colon before an equation?</div><div class="b">No. Punctuate it as part of the sentence and end with a period.</div></div>
+<div class="fc"><div class="f">Every random term needs …</div><div class="b">A distribution, and a statement that the random terms are independent.</div></div>
+<div class="fc"><div class="f">Definitions format</div><div class="b">Sentences in text format, not a bullet list.</div></div>
+</section>
+</template>
+
+<template data-review="1">
+<div class="ol"><div class="oq">What is a data generating process?</div><div class="oa">A statement of how each observation arises: mean function, indices, random terms, their distributions and dependence.</div></div>
+<div class="ol"><div class="oq">Name the three ways Assignment 3 asked you to write the DGP.</div><div class="oa">ANOVA (effects), regression with dummy variables, matrix notation.</div></div>
+<div class="ol"><div class="oq">Write a one-way ANOVA with random years.</div><div class="oa">\(y_{it}=\mu+\alpha_i+u_t+\varepsilon_{it}\), \(u_t\sim N(0,\sigma_u^2)\), \(\varepsilon_{it}\sim N(0,\sigma_e^2)\), independent.</div></div>
+<div class="ol"><div class="oq">How many dummies with an intercept and \(I\) treatments?</div><div class="oa">\(I-1\).</div></div>
+<div class="ol"><div class="oq">Why is a model with as many parameters as cells and no replication a problem?</div><div class="oa">It is singular; the residual variance cannot be estimated.</div></div>
+<div class="ol"><div class="oq">What does \(\gamma_n\) represent in an ANOVA with nitrogen levels?</div><div class="oa">The fixed effect (coefficient) of level \(n\), not the rate itself.</div></div>
+<div class="ol"><div class="oq">What does \(\mathbf j_T\) mean?</div><div class="oa">A \(T\times1\) vector of ones.</div></div>
+<div class="ol"><div class="oq">What does the Kronecker product do in \(\mathbf I_N\otimes\mathbf j_T\)?</div><div class="oa">Builds a block of intercept dummies, each repeated for an individual's \(T\) observations.</div></div>
+<div class="ol"><div class="oq">Write the error-components covariance block for one individual.</div><div class="oa">\(\boldsymbol\Phi_i=\sigma_\mu^2\mathbf j_T\mathbf j_T'+\sigma_e^2\mathbf I_T\).</div></div>
+<div class="ol"><div class="oq">What estimator uses \(\boldsymbol\Phi^{-1}\)?</div><div class="oa">GLS: \((\mathbf X'\boldsymbol\Phi^{-1}\mathbf X)^{-1}\mathbf X'\boldsymbol\Phi^{-1}\mathbf Y\).</div></div>
+<div class="ol"><div class="oq">What is REML and why use it?</div><div class="oa">Restricted maximum likelihood; it removes the small-sample downward bias in variance estimates.</div></div>
+<div class="ol"><div class="oq">Give the main reason year is treated as random.</div><div class="oa">It is not controlled by the researcher.</div></div>
+<div class="ol"><div class="oq">Two other reasons year is random?</div><div class="oa">Inference to all years; higher power and lower standard errors.</div></div>
+<div class="ol"><div class="oq">When would random year effects give falsely small standard errors?</div><div class="oa">When year is confounded with something else, e.g., stand age in a perennial like switchgrass.</div></div>
+<div class="ol"><div class="oq">Fixed or random variety effects for paired comparisons?</div><div class="oa">Fixed.</div></div>
+<div class="ol"><div class="oq">Fixed or random variety effects for ranking varieties with unequal observations?</div><div class="oa">Random (BLUP / Bayesian shrinkage).</div></div>
+<div class="ol"><div class="oq">Why did Breck and Showdown swap ranks in Assignment 2?</div><div class="oa">Breck's high raw mean came from only 11 site-years, so it shrank more than Showdown's (46 site-years).</div></div>
+<div class="ol"><div class="oq">What line of PROC MIXED output feeds a likelihood-ratio test?</div><div class="oa">−2 Res Log Likelihood.</div></div>
+<div class="ol"><div class="oq">AIC and BIC: bigger or smaller is better?</div><div class="oa">Smaller.</div></div>
+<div class="ol"><div class="oq">When can you compare REML likelihoods across models?</div><div class="oa">Only when the fixed effects are identical.</div></div>
+<div class="ol"><div class="oq">What SAS statement declares discrete variables?</div><div class="oa">CLASS.</div></div>
+<div class="ol"><div class="oq">Is a continuous covariate a fixed or random effect?</div><div class="oa">Fixed (a regression coefficient), just not a CLASS variable.</div></div>
+<div class="ol"><div class="oq">Why average over blocks before estimating?</div><div class="oa">No explanatory variable varies at block level, so disaggregating adds no information (and it runs faster).</div></div>
+<div class="ol"><div class="oq">What is the most common notation blunder?</div><div class="oa">Giving one symbol two definitions.</div></div>
+<div class="ol"><div class="oq">Italic or roman: variables, numbers, cos?</div><div class="oa">Variables italic; numbers and cos roman.</div></div>
+<div class="ol"><div class="oq">Colon before an equation: yes or no?</div><div class="oa">No; punctuate normally and end with a period.</div></div>
+<div class="ol"><div class="oq">Which side for equation numbers?</div><div class="oa">Right.</div></div>
+<div class="ol"><div class="oq">How should definitions of symbols be formatted?</div><div class="oa">As sentences in text, not as a list.</div></div>
+<div class="ol"><div class="oq">Preferred way to state a normal error?</div><div class="oa">\(\varepsilon_{it}\sim N(0,\sigma^2)\).</div></div>
+<div class="ol"><div class="oq">Regression vs ANOVA terminology?</div><div class="oa">Regression for observational data; ANOVA for designed experiments.</div></div>
+</template>

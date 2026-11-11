@@ -1,0 +1,385 @@
+
+<!-- ===================== CHAPTER 2 ===================== -->
+<template data-chapter="2" data-part="I. The primal approach" data-title="Specifying expected-profit maximization" data-dates="Sep 2 · Sep 4 · Sep 11 TA session · Sep 18 · Sep 21 · Sep 25" data-color="2"></template>
+
+<template data-lesson="c2l1" data-ch="2" data-title="The optimization template and discrete choices" data-src="Sep 4, Sep 9, Sep 11 worksheet, Sep 21 notebook · Assignment 1" data-yt="constrained optimization economics choice variable objective function">
+<section data-s="learn">
+<h3>The template</h3>
+<div class="formula"><span class="lbl">Every optimization answer (Sep 21 notebook)</span>
+\[\max_{\text{choice variable}}\ \text{objective}(\text{choice variable})\quad\text{s.t.}\quad\text{choice space and constraints}\]</div>
+<p>Circle the four pieces on every exam answer:</p>
+<ol class="pts">
+<li><b>Choice variable</b> (what the decision maker picks).</li>
+<li><b>Choice space</b>: real numbers \(\mathbb R_+\), integers \(\mathbb Z^+\), \(\{0,1\}\), a list of varieties … "A lot of people struggle by leaving this part off."</li>
+<li><b>Objective function</b> written as a function of the choice variable (somewhere, possibly through constraints).</li>
+<li><b>Constraints</b> (land, capacity, budget, sum of shares = 1).</li>
+</ol>
+<div class="prof"><span class="lbl">In class (Sep 21)</span>"I find over time that I'm very successful at teaching how to do a data generating process. And not so much on the optimization problem." Faculty "down the hall" can all do it, "which tells me it's probably pretty important." He prefers the choice space after "subject to"; writing "\(\in\) space" under max is acceptable.</div>
+<div class="tip"><b>argmax vs max.</b> \(T^*=\arg\max_T\pi(T)\) is the <i>choice</i> that maximizes; \(\max_T\pi(T)\) is the resulting <i>value</i>.</div>
+
+<h3>Two ways to impose a constraint</h3>
+<p>"Mathematically, there's two ways. One of them is <b>substitution</b> [put the constraint into the objective] ... and the other is the <b>Lagrangian</b> approach [keep it as a restriction]. Either way is okay."</p>
+
+<h3>Discrete choices</h3>
+<div class="formula"><span class="lbl">Pick one variety (TA worksheet, Problem 1: cotton)</span>
+\[\max_{x_1,\dots,x_n}\ \sum_{i=1}^{n}x_i\,E\!\left(P_cY_{ci}+P_sY_{si}-C_i\right)\quad\text{s.t.}\quad\sum_{i=1}^{n}x_i=1,\ x_i\in\{0,1\}.\]
+\(P_c,Y_{ci}\): lint price and yield; \(P_s,Y_{si}\): cottonseed price and yield; \(C_i\): cost including seed for variety \(i\).</div>
+<p>Simplest form (pigeon problem, Sep 9): choose location \(i\in\{1,2,3\}\) to maximize food\(_i\); a variant maximizes food\(_i-d_i\) (travel distance). No "food ≥ 0" constraint is needed because food at each location is given.</p>
+<div class="clarify"><span class="lbl">Clarifying: Assignment 1 with feral rye</span>One way to write it: \(\max_{i\in\{1,\dots,10\}}E(\pi_i)=p\,E(y_i)\,(1-L\,s\,\mathbb 1[\text{no herbicide}_i])-c_i-h_i\), where \(L=0.25\) is the rye yield loss, \(s\) the infestation share, \(c_i\) seed cost ($24 conventional, $33 Clearfield, $37 CoAXium) and \(h_i\) herbicide cost ($16 or $22). The break-even infestation is where two traits give equal expected profit. This is an illustration, not the answer key.</div>
+<div class="prof"><span class="lbl">In class</span>"There's more than one way of answering these." "If you're ever gonna get an answer down, you're gonna have to write more." Pick a choice variable and go.</div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Tea at a restaurant: green or black. Write the problem.</summary><div class="body"><p>\(\max_{x_G,x_B}\ x_GU_G+x_BU_B\) s.t. \(x_G+x_B=1\), \(x_G,x_B\in\{0,1\}\). No market price needed; maximize utility.</p></div></details>
+<details class="sol"><summary>Broiler house: growth falls and death rises with density. Write the expected-profit problem.</summary><div class="body"><p>Choose \(x\in\{0,1,\dots,\bar x\}\) (birds placed, up to capacity \(\bar x\)) to maximize \(E(\pi)=p\,x\,s(x)\,w(x)-c(x)\), where \(s(x)\) is survival and \(w(x)\) market weight, both decreasing in density, and \(c(x)\) cost.</p></div></details>
+<details class="sol"><summary>Meat goats vs cattle: budgets show higher per-acre goat returns. Write the acreage problem for a risk-neutral producer.</summary><div class="body"><p>\(\max_{A_g,A_c}\ E(R_g)A_g+E(R_c)A_c\) s.t. \(A_g+A_c\le\bar A\), labor, fencing, capital constraints, \(A_g,A_c\ge0\). The point of the question: per-acre budget returns ignore constraints (and risk), so the higher per-acre number alone does not justify an extension program.</p></div></details>
+<details class="sol"><summary>Apple thinning (Sep 2–4): set up the problem.</summary><div class="body"><p>Let \(A\in\mathbb Z^+\) be apples left per tree. Size \(=f(A,\text{tree size})\), price \(=p(\text{size})\), total weight \(=A\times\text{size}\). \(\max_A\ E\big[p(\text{size}(A))\cdot A\cdot\text{size}(A)\big]-c(A)\). Thinning moves price and quantity in opposite directions; at an early stage total weight changes little and size changes a lot. Students' AI answers missed the expectation, the cost and the choice space.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Lagrangian intuition" data-by="MATLAB" href="https://www.youtube.com/watch?v=GR4ff0dTLTw">Constrained Optimization: Intuition behind the Lagrangian</a>
+<a class="vid" data-tag="Worked example" data-by="Dr. Trefor Bazett" href="https://www.youtube.com/watch?v=8mjcnxGMwFo">Lagrange Multipliers: Geometric Meaning and Full Example</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="1"><div class="stem">Which part of an optimization answer do students most often leave off?</div><ol><li>The max operator</li><li>The choice space</li><li>The word "profit"</li><li>The equation number</li></ol><div class="why">"A lot of people struggle by leaving this part off."</div></div>
+<div class="q" data-a="3"><div class="stem">What does \(\arg\max_T\pi(T)\) return?</div><ol><li>The maximum profit</li><li>The gradient</li><li>The Lagrange multiplier</li><li>The value of \(T\) that maximizes profit</li></ol><div class="why">argmax gives the argument; max gives the value.</div></div>
+<div class="q" data-a="0"><div class="stem">"Pick exactly one variety" is written as:</div><ol><li>\(\sum_i x_i=1,\ x_i\in\{0,1\}\)</li><li>\(x_i\ge0\)</li><li>\(\sum_i x_i\le 1,\ x_i\in\mathbb R\)</li><li>\(x_i=1\) for all \(i\)</li></ol><div class="why">Binary indicators that sum to one.</div></div>
+<div class="q" data-a="2"><div class="stem">Two acceptable ways to impose a constraint:</div><ol><li>Ignore it or approximate it</li><li>Simulation or bootstrapping</li><li>Substitution into the objective or a Lagrangian restriction</li><li>Fixed or random effects</li></ol><div class="why">Either way is okay.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Four pieces of an optimization problem</div><div class="b">Choice variable, choice space, objective as a function of the choice, constraints</div></div>
+<div class="fc"><div class="f">argmax vs max</div><div class="b">argmax = optimal choice; max = optimal value</div></div>
+<div class="fc"><div class="f">Binary single choice</div><div class="b">\(x_i\in\{0,1\},\ \sum x_i=1\)</div></div>
+<div class="fc"><div class="f">Why the goats-vs-cattle budget comparison misleads</div><div class="b">Per-acre returns ignore binding constraints (land, labor, capital) and risk.</div></div>
+</section>
+</template>
+
+<template data-lesson="c2l2" data-ch="2" data-title="Expectations: price × yield, stationarity and covariance" data-src="Handout on moments of products · Sep 18, Sep 21, Sep 25 lectures · Exam 1 study guide" data-yt="expected value of product of random variables covariance">
+<section data-s="learn">
+<h3>When do you need \(E(\cdot)\)?</h3>
+<p>Use an expectation for anything unknown at decision time: output price and yield. Input prices (fertilizer) are usually known when the input is applied, so cost needs no expectation unless prices are contracted later. Writing yield without an expectation "is probably sloppiness." "You should use it when it makes sense."</p>
+
+<h3>Expected revenue is not always \(E(P)E(Y)\)</h3>
+<div class="formula"><span class="lbl">Moments of products (Bohrnstedt and Goldberger 1969 handout)</span>
+\[E(PY)=E(P)E(Y)+\operatorname{cov}(P,Y).\]
+Zero covariance is enough to write \(E(PY)=E(P)E(Y)\); independence is stronger.</div>
+<div class="formula"><span class="lbl">Variance of a product, independent case</span>
+\[\operatorname{var}(PY)=E^2(P)\operatorname{var}(Y)+E^2(Y)\operatorname{var}(P)+\operatorname{var}(P)\operatorname{var}(Y).\]
+Bivariate normal: add \(2E(P)E(Y)\operatorname{cov}+\operatorname{cov}^2\).</div>
+<div class="exam"><span class="lbl">Exam 1 study guide</span>"State the assumptions needed to express expected revenue as E(price)E(quantity)." Answer: price and quantity are uncorrelated (cov = 0), which holds, for example, for a price-taking farm whose local yield does not move the market price. "Covariance of price and yield ... you really ought to know this one."</div>
+<div class="clarify"><span class="lbl">Clarifying: why price and yield can be unconnected</span>A single farm is a price taker: its own yield shock is too small to move the national price, so local yield and price can be treated as uncorrelated. At the national or regional level a big crop lowers price (negative covariance, a natural hedge).</div>
+
+<h3>Stationary yields, Markov prices</h3>
+<div class="prof"><span class="lbl">Exam 1 feedback (Sep 25)</span>"I want you to think about expectations, and that your expectation process for yield is different than your expectation process for prices." He was unhappy that students applied 1990 prices to 1990 yields. "Expect to see that question again on the final exam."</div>
+<ul class="pts">
+<li><b>Yield</b> is (approximately) <b>stationary</b>: a constant mean over time after any trend adjustment, so the whole history informs \(E(Y)\).</li>
+<li><b>Prices</b> follow a Markov-type process: "all that really matters is ... right now." Use current futures plus expected basis (e.g., Kansas City July futures with a −$0.50 basis in Assignment 2).</li>
+<li>Season-average price is an average across time; remove storage costs to get an expected harvest price. Naive expectations (last year's price) are "considered kind of valid ... not exactly wrong," but closer to rational expectations is preferred.</li>
+<li>Exception: building a rule for many years may use average prices, but every price series must cover the same period (feeder cattle prices depend on corn prices).</li>
+</ul>
+
+<h3>Mean–variance objective (handout)</h3>
+<div class="formula"><span class="lbl">Profit variance and the input FOC</span>
+\[\max_X\ E(PQ)-\sum_j\gamma_jX_j-\lambda\operatorname{var}(PQ),\qquad \frac{\partial\operatorname{var}(PQ)}{\partial X_j}=2\operatorname{cov}(PQ,\,PF_j).\]
+"The covariance between total revenue and value of the marginal product determines what happens marginally to the variance of profit."</div>
+<div class="formula"><span class="lbl">Portfolio variance</span>\(\operatorname{var}(aR_1+bR_2)=a^2\sigma_1^2+b^2\sigma_2^2+2ab\operatorname{cov}(R_1,R_2)\). Ignoring covariance can erase or invent diversification.</div>
+<div data-tool="revenue"></div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>E(P) = $6, E(Y) = 45 bu, SD(P) = 1, SD(Y) = 10, ρ = −0.3. Find E(PY).</summary><div class="body"><p>cov = −0.3(1)(10) = −3. \(E(PY)=6\times45-3=\)<span class="ans">$267</span>, not $270.</p></div></details>
+<details class="sol"><summary>Why is it wrong to pair 1990 prices with 1990 yields to form an expected profit for 2027?</summary><div class="body"><p>Yields are stationary, so all years inform expected yield; but price expectations should come from current information (futures + basis). Mixing old prices with old yields builds in historic price levels and the historic yield–price covariance that are irrelevant now.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Intuition" data-by="In Case of Econ Struggles" href="https://www.youtube.com/watch?v=fJzrPkZzytw">Learn the Intuition Behind Jensen's Inequality in 3 Minutes</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="1"><div class="stem">\(E(PY)=E(P)E(Y)\) requires:</div><ol><li>Both normal</li><li>\(\operatorname{cov}(P,Y)=0\)</li><li>Equal variances</li><li>Stationary prices</li></ol><div class="why">\(E(PY)=E(P)E(Y)+\operatorname{cov}(P,Y)\).</div></div>
+<div class="q" data-a="0"><div class="stem">Which is typically treated as stationary?</div><ol><li>Detrended yields</li><li>Cash prices</li><li>Futures prices</li><li>Land values</li></ol><div class="why">Yields have a stable mean (after trend); prices are closer to a Markov process.</div></div>
+<div class="q" data-a="2"><div class="stem">Best expected harvest price for next year's decision:</div><ol><li>The average price from 1990–2025</li><li>Last year's season-average price, no adjustment</li><li>Current futures for harvest delivery plus expected basis</li><li>The price in the year with the highest yield</li></ol><div class="why">Price expectations should use current market information.</div></div>
+<div class="q" data-a="3"><div class="stem">Is fertilizer price usually written with an expectation in the objective?</div><ol><li>Always</li><li>Only when yields are normal</li><li>Only with random effects</li><li>No, it is usually known when N is applied</li></ol><div class="why">Use expectations only for what is unknown at decision time.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">E(PY)</div><div class="b">\(E(P)E(Y)+\operatorname{cov}(P,Y)\)</div></div>
+<div class="fc"><div class="f">var(PY) with independence</div><div class="b">\(E^2(P)\operatorname{var}(Y)+E^2(Y)\operatorname{var}(P)+\operatorname{var}(P)\operatorname{var}(Y)\)</div></div>
+<div class="fc"><div class="f">Yield vs price expectation process</div><div class="b">Yield: stationary, use the whole history. Price: Markov, use current information (futures + basis).</div></div>
+<div class="fc"><div class="f">Marginal effect of input on profit variance</div><div class="b">\(\partial\operatorname{var}(PQ)/\partial X_j=2\operatorname{cov}(PQ,PF_j)\)</div></div>
+</section>
+</template>
+
+<template data-lesson="c2l3" data-ch="2" data-title="Continuous choices: calculus optimum for a quadratic" data-src="Sep 4 lecture (nitrogen × 44 years) · Exam 1 study guide item 8" data-yt="quadratic production function optimal fertilizer rate economics">
+<section data-s="learn">
+<h3>From discrete to continuous</h3>
+<p>"We've been doing discrete choices, and next we're gonna move to continuous choices." A nitrogen experiment can be analyzed as a discrete choice (choose among the tested rates using ANOVA means and budgets) or as a continuous one (estimate a response function and use calculus).</p>
+<div class="formula"><span class="lbl">Quadratic response, known prices</span>
+\[\max_{N\ge0}\ pE(y)-rN,\qquad E(y)=\beta_0+\beta_1N+\beta_2N^2,\ \beta_2&lt;0.\]
+FOC: \(p(\beta_1+2\beta_2N)=r\) ⇒ \[N^*=\frac{r/p-\beta_1}{2\beta_2}.\]
+SOC: \(2p\beta_2&lt;0\) holds when \(\beta_2&lt;0\). Clip to 0 if negative.</div>
+<p>The economic principle is <b>expected marginal revenue = marginal cost</b> (VMP = input price). The profit-maximizing rate is always below the yield-maximizing rate \(-\beta_1/(2\beta_2)\) when \(r&gt;0\).</p>
+<div data-tool="quadopt"></div>
+<div class="clarify"><span class="lbl">Clarifying: discrete choice with ANOVA means</span>With ANOVA means for each tested rate, compute expected profit \(p\bar y_n-rN_n-\text{other costs}\) for each rate and pick the highest. That is "item 8" on the Exam 1 study guide: "with an ANOVA and budgets, choose the alternative with the higher expected profit."</div>
+<div class="warn"><span class="lbl">Check boundaries</span>Always compare the interior solution with the feasible bounds (0, the maximum rate) and with every discrete alternative.</div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>β₀ = 20, β₁ = 0.6, β₂ = −0.003, p = $6/bu, r = $0.70/lb. Find N* and the yield-maximizing N.</summary><div class="body"><p>\(r/p=0.1167\). \(N^*=(0.1167-0.6)/(2\times-0.003)=\)<span class="ans">80.6 lb N/acre</span>. Yield max: \(-0.6/(-0.006)=100\) lb.</p></div></details>
+<details class="sol"><summary>Wheat at $6.90/bu, ANOVA means 40 bu at 0 N and 52 bu at 60 lb N, N at $0.60/lb. Which rate?</summary><div class="body"><p>0 N: \(6.90\times40=276\). 60 N: \(6.90\times52-0.60\times60=358.8-36=322.8\). <span class="ans">Apply 60 lb N</span> (higher expected profit by $46.80/acre).</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Optimization" data-by="Dr. Trefor Bazett" href="https://www.youtube.com/watch?v=8mjcnxGMwFo">Lagrange Multipliers: Geometric Meaning and Full Example</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="2"><div class="stem">For \(y=\beta_0+\beta_1N+\beta_2N^2\), the profit-maximizing N is:</div><ol><li>\(-\beta_1/(2\beta_2)\)</li><li>\(r/(p\beta_1)\)</li><li>\((r/p-\beta_1)/(2\beta_2)\)</li><li>\(\beta_1/\beta_2\)</li></ol><div class="why">Set \(p(\beta_1+2\beta_2N)=r\).</div></div>
+<div class="q" data-a="0"><div class="stem">When N price rises, the optimal N from a quadratic:</div><ol><li>Falls</li><li>Rises</li><li>Does not change</li><li>Goes to the yield maximum</li></ol><div class="why">\(r/p\) rises; with \(\beta_2&lt;0\) the numerator grows less negative, so \(N^*\) falls.</div></div>
+<div class="q" data-a="1"><div class="stem">The second-order condition for a maximum requires:</div><ol><li>\(\beta_1&gt;0\)</li><li>\(\beta_2&lt;0\)</li><li>\(p&gt;r\)</li><li>\(\beta_0&gt;0\)</li></ol><div class="why">The objective must be concave in N.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Quadratic N*</div><div class="b">\(N^*=(r/p-\beta_1)/(2\beta_2)\)</div></div>
+<div class="fc"><div class="f">Economic rule for an interior optimum</div><div class="b">Expected marginal revenue = marginal cost (VMP = input price)</div></div>
+<div class="fc"><div class="f">Discrete version of the N decision</div><div class="b">Compute expected profit at each tested rate from ANOVA means; pick the highest.</div></div>
+</section>
+</template>
+
+<template data-review="2">
+<div class="ol"><div class="oq">Write the general optimization template.</div><div class="oa">\(\max_{\text{choice}}\ \text{objective(choice)}\) s.t. choice space and constraints.</div></div>
+<div class="ol"><div class="oq">What four things must every optimization answer identify?</div><div class="oa">Choice variable, choice space, objective function, constraints.</div></div>
+<div class="ol"><div class="oq">What does argmax return?</div><div class="oa">The value of the choice variable that maximizes the objective.</div></div>
+<div class="ol"><div class="oq">Two ways to impose a constraint?</div><div class="oa">Substitution or a Lagrangian restriction.</div></div>
+<div class="ol"><div class="oq">How do you write "choose exactly one of n varieties"?</div><div class="oa">\(x_i\in\{0,1\}\), \(\sum_i x_i=1\).</div></div>
+<div class="ol"><div class="oq">Write the cotton variety problem's objective.</div><div class="oa">\(\sum_i x_iE(P_cY_{ci}+P_sY_{si}-C_i)\).</div></div>
+<div class="ol"><div class="oq">Why is there no constraint "food ≥ 0" in the pigeon problem?</div><div class="oa">Food at each location is given, not chosen.</div></div>
+<div class="ol"><div class="oq">What is the choice space for apples left on a tree?</div><div class="oa">Positive integers, \(\mathbb Z^+\).</div></div>
+<div class="ol"><div class="oq">In the apple problem, how does thinning affect price and quantity?</div><div class="oa">In opposite directions: fewer apples, bigger size and higher price per unit.</div></div>
+<div class="ol"><div class="oq">Why might the goats-vs-cattle budgets not justify an extension program?</div><div class="oa">Per-acre returns ignore constraints and risk; the full allocation problem may not favor goats.</div></div>
+<div class="ol"><div class="oq">Which quantities get an expectation in the objective?</div><div class="oa">Those unknown at decision time, typically output price and yield.</div></div>
+<div class="ol"><div class="oq">Formula for \(E(PY)\)?</div><div class="oa">\(E(P)E(Y)+\operatorname{cov}(P,Y)\).</div></div>
+<div class="ol"><div class="oq">Assumption for \(E(PY)=E(P)E(Y)\)?</div><div class="oa">Zero covariance between price and yield.</div></div>
+<div class="ol"><div class="oq">Why can a farm's price and yield be treated as unconnected?</div><div class="oa">The farm is a price taker; its yield does not move the market price.</div></div>
+<div class="ol"><div class="oq">var(PY) under independence?</div><div class="oa">\(E^2(P)\operatorname{var}(Y)+E^2(Y)\operatorname{var}(P)+\operatorname{var}(P)\operatorname{var}(Y)\).</div></div>
+<div class="ol"><div class="oq">Yield expectation process?</div><div class="oa">Stationary: use the whole (detrended) history.</div></div>
+<div class="ol"><div class="oq">Price expectation process?</div><div class="oa">Markov: use current information such as futures plus basis.</div></div>
+<div class="ol"><div class="oq">How do you turn season-average prices into an expected harvest price?</div><div class="oa">Remove storage costs (season average includes post-harvest carry).</div></div>
+<div class="ol"><div class="oq">What determines the marginal effect of an input on profit variance?</div><div class="oa">\(2\operatorname{cov}(PQ,PF_j)\): covariance of revenue with the value of the marginal product.</div></div>
+<div class="ol"><div class="oq">Portfolio variance of \(aR_1+bR_2\)?</div><div class="oa">\(a^2\sigma_1^2+b^2\sigma_2^2+2ab\operatorname{cov}(R_1,R_2)\).</div></div>
+<div class="ol"><div class="oq">Quadratic production function optimal N?</div><div class="oa">\((r/p-\beta_1)/(2\beta_2)\).</div></div>
+<div class="ol"><div class="oq">Yield-maximizing N for a quadratic?</div><div class="oa">\(-\beta_1/(2\beta_2)\).</div></div>
+<div class="ol"><div class="oq">Economic condition for an interior optimum?</div><div class="oa">Expected marginal revenue = marginal cost.</div></div>
+<div class="ol"><div class="oq">Discrete N choice from ANOVA means: how?</div><div class="oa">Compute expected profit at each tested rate and pick the largest.</div></div>
+</template>
+
+<!-- ===================== CHAPTER 3 ===================== -->
+<template data-chapter="3" data-part="I. The primal approach" data-title="Plateau production functions" data-dates="Sep 9 · Sep 14 · Sep 16 · Sep 18 · Sep 21 · Assignments 4–5" data-color="3"></template>
+
+<template data-lesson="c3l1" data-ch="3" data-title="The linear plateau and PROC NLMIXED" data-src="Sep 9 lecture · Sep 18 old-exam review · Sep 21 · Assignment 4" data-yt="linear plateau model nitrogen response piecewise regression">
+<section data-s="learn">
+<h3>The model</h3>
+<div class="formula"><span class="lbl">Linear response plateau (two equivalent parameterizations)</span>
+\[y=\min(\beta_0+\beta_1N,\ P)\qquad\text{or}\qquad y=\beta_0+\beta_1\min(N,\bar T),\]
+continuity restriction \(\beta_0+\beta_1\bar T=P\). Four symbols, three free parameters.</div>
+<p>"It makes absolutely no difference mathematically. You get the same answers. Statistics are the same." The professor estimates the plateau \(P\); Claude's code often estimates the threshold \(\bar T\).</p>
+
+<h3>Why agronomists like it</h3>
+<ul class="pts">
+<li>Liebig's law of the minimum: in dryland agriculture water is usually most limiting. The crop uses N only as far as water allows, so yield rises linearly with N and then goes flat.</li>
+<li>Earl Heady used quadratics; agronomists moved to plateaus.</li>
+<li>It is a "broken stick" spline with a continuity restriction but no differentiability restriction, so it is not twice differentiable and you cannot set a derivative to zero.</li>
+</ul>
+<div class="formula"><span class="lbl">Optimum of a deterministic linear plateau</span>
+On the rising part VMP \(=p\beta_1\) and MC \(=r\) are both constant. If \(p\beta_1&gt;r\), apply up to the knot \(N=(P-\beta_0)/\beta_1\); if \(p\beta_1&lt;r\), apply 0. "There's no fancy optimization."</div>
+<p>That is why agronomists' rules ignore prices (Oklahoma wheat: 2 lb N per bushel of yield goal; cotton: 50 lb per bale). "If this is the right production function, that is the right answer." But the plateau moves with rainfall from year to year, and pooling many site-years into one deterministic plateau is misspecified, which is why a quadratic can fit pooled data better.</p>
+
+<div class="warn"><span class="lbl">The min is not an optimization</span>"This is not an optimization problem. This is just a mathematical function." min(·) describes yield; you maximize expected profit.</div>
+
+<h3>Quadratic plateau</h3>
+<p>Quadratic up to a join point, flat after. Impose continuity and differentiability at the join: five parameters minus two restrictions = three free parameters. The optimum is always on the curved part, found from the FOC.</p>
+
+<h3>PROC NLMIXED and convergence</h3>
+<ul class="pts">
+<li>PROC MIXED: linear models. PROC NLMIXED: nonlinear models, one RANDOM statement only (no REPEATED, no nested random effects), non-normal likelihoods allowed. A quadratic is linear in parameters, so PROC MIXED can fit it.</li>
+<li><b>PARMS</b> supplies starting values. Two classic failure causes: <b>poor starting values</b> and <b>poor scaling</b> (a dependent variable near 10 with a regressor near 100,000; the quasi-Newton method inverts the Hessian, and mixing very large and small numbers causes numerical trouble).</li>
+<li>Convergence means the <b>gradients</b> (first-order conditions) are near zero, about \(10^{-3}\). "You shouldn't necessarily trust Claude in terms of convergence." Poor scaling can make the routine stop early and report a false optimum.</li>
+<li>Kinked likelihoods can have local optima: rerun with different starting values and keep the run with the larger log likelihood. Smoothing the corner also helps (Claude "rounded off" the corner in Assignment 5).</li>
+<li>Scaling inside SAS (e.g., <code>s2u_actual = s2u*100</code>) must be reversed when reporting.</li>
+</ul>
+<div class="clarify"><span class="lbl">Clarifying: yield skewness</span>Alabama (it almost always rains, an occasional bad year) → negatively skewed yields. Western Oklahoma (rarely rains, an occasional good year) → positively skewed. Production functions may need non-normal errors.</div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Old exam: intercept 25, plateau 40, slope 0.5. What N maximizes profit?</summary><div class="body"><p>Knot \(=(40-25)/0.5=\)<span class="ans">30 lb N</span> if \(p\times0.5&gt;r\); otherwise 0. Nothing in between can be optimal.</p></div></details>
+<details class="sol"><summary>Why might a quadratic fit pooled multi-state data better than a linear plateau?</summary><div class="body"><p>The true plateau differs by site-year (rainfall). One fixed plateau fitted to pooled data is misspecified; averaging many kinked lines with different plateaus produces a smooth, curved average response that a quadratic approximates.</p></div></details>
+<details class="sol"><summary>Assignment 4 data traps: what did you have to decide before estimating?</summary><div class="body"><ul class="pts"><li>16 treatments are not 16 rates: some reach the same total N with different timing.</li><li>Previous crop is in another file; keep corn after soybean.</li><li>Missing yields read in as text.</li><li>Documented problem site-years (hail, ponding, an extra 45 kg N applied by mistake).</li></ul></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Piecewise models" data-by="Let's Learn, Nemo!" href="https://www.youtube.com/watch?v=Yh_ggohqxuA">Piecewise Linear and Spline Regression</a>
+<a class="vid" data-tag="Likelihood" data-by="StatQuest with Josh Starmer" href="https://www.youtube.com/watch?v=XepXtl9YKwc">Maximum Likelihood, clearly explained</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="3"><div class="stem">For a deterministic linear plateau with \(p\beta_1&gt;r\), optimal N is:</div><ol><li>Where the derivative equals zero</li><li>Zero</li><li>Halfway to the knot</li><li>The knot \((P-\beta_0)/\beta_1\)</li></ol><div class="why">VMP exceeds MC all the way to the knot, then the marginal product is zero.</div></div>
+<div class="q" data-a="1"><div class="stem">How many free parameters in \(y=\min(\beta_0+\beta_1N,P)\)?</div><ol><li>2</li><li>3</li><li>4</li><li>5</li></ol><div class="why">Intercept, slope, plateau; the knot follows from continuity.</div></div>
+<div class="q" data-a="0"><div class="stem">PROC NLMIXED reports convergence. What should you check?</div><ol><li>The gradient column is near zero (about 10⁻³)</li><li>The R² is above 0.9</li><li>AIC is negative</li><li>The number of iterations is small</li></ol><div class="why">Convergence = first-order conditions near zero; poor scaling can fake convergence.</div></div>
+<div class="q" data-a="2"><div class="stem">Two runs with different starting values give different estimates. Which do you keep?</div><ol><li>The first run</li><li>The one with fewer iterations</li><li>The one with the larger log likelihood</li><li>Average them</li></ol><div class="why">Local optima: choose the higher likelihood.</div></div>
+<div class="q" data-a="1"><div class="stem">Why do agronomists' N recommendations ignore prices?</div><ol><li>They assume risk neutrality</li><li>With a linear plateau the optimum is the knot whenever \(p\beta_1&gt;r\)</li><li>Prices are stationary</li><li>Fertilizer is free</li></ol><div class="why">The knot does not depend on prices as long as the input pays on the rising segment.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Linear plateau, two forms</div><div class="b">\(\min(\beta_0+\beta_1N,P)\) or \(\beta_0+\beta_1\min(N,\bar T)\), with \(\beta_0+\beta_1\bar T=P\)</div></div>
+<div class="fc"><div class="f">Deterministic plateau optimum</div><div class="b">Knot if \(p\beta_1&gt;r\), zero if \(p\beta_1&lt;r\)</div></div>
+<div class="fc"><div class="f">Two causes of nonconvergence</div><div class="b">Poor starting values and poor scaling</div></div>
+<div class="fc"><div class="f">Convergence criterion</div><div class="b">Gradients near zero (≈ 10⁻³)</div></div>
+<div class="fc"><div class="f">Quadratic plateau free parameters</div><div class="b">Five minus two (continuity, differentiability) = three</div></div>
+</section>
+</template>
+
+<template data-lesson="c3l2" data-ch="3" data-title="The stochastic plateau and optimal nitrogen" data-src="Sep 14 · Sep 16 (Tembo et al. eq. 6 and 14) · Sep 21 · Assignment 5" data-yt="stochastic plateau nitrogen response Tembo">
+<section data-s="learn">
+<h3>Make the plateau random</h3>
+<p>"We can make any parameter a function of variables" (Sep 14): \(y\sim N(\mu,\sigma^2)\) → \(y\sim N(\mathbf X\boldsymbol\beta,\sigma^2)\) (regression) → \(y\sim N(\mathbf X\boldsymbol\beta,\mathbf Z\boldsymbol\alpha)\) (heteroskedasticity). The variance equation is deterministic because \(\mathbf Z\) is known; stochastic volatility would need an integral in the likelihood.</p>
+<div class="formula"><span class="lbl">Stochastic plateau DGP (class form)</span>
+\[y_{itr}=\min(\beta_0+\beta_1N_i,\ P_t)+\gamma_t+\lambda_r+\varepsilon_{itr},\qquad P_t=\bar P+\delta_t,\ \delta_t\sim N(0,\sigma_\delta^2),\]
+\(\gamma_t\sim N(0,\sigma_\gamma^2)\) year effect, \(\lambda_r\sim N(0,\sigma_\lambda^2)\) block effect, \(\varepsilon_{itr}\sim N(0,\sigma_\varepsilon^2)\), all independent. The slope \(\beta_1\) is a constant.</div>
+<div class="tip"><b>Where the randomness goes.</b> Rainfall is what is random, and it enters through the <b>plateau</b>, inside the min. Errors outside the min only shift the whole curve. (Exam 1's consistently missed question.)</div>
+<div class="prof"><span class="lbl">In class (Sep 14)</span>Technology for corn raised yield at high N much more than yield at zero N: the plateau moved. "You need to make the plateau parameter a function of time" rather than the intercept: \(P_t=\bar P+\rho t+\delta_t\).</div>
+
+<h3>Expected yield (Tembo et al., equation 6)</h3>
+<p>Let \(a=\beta_0+\beta_1N\), \(z=(a-\bar P)/\sigma\), \(\Phi\) the standard normal CDF and \(\phi\) its density.</p>
+<div class="formula"><span class="lbl">The expectation does not pass through the min</span>
+\[E(y)=\big(1-\Phi(z)\big)a+\Phi(z)\bar P-\sigma\phi(z).\]
+\(\Phi(z)\) = probability the plateau binds. The last term: when you are on the plateau, it is a relatively low plateau ("the plateau mean minus something").</div>
+<div class="warn"><span class="lbl">Classic error</span>Never replace \(E[\min(a,P)]\) with \(\min(a,E(P))\). Expected yield is smooth (no kink) even though every year's response has one. The model is like a Tobit (censored normal).</div>
+
+<h3>Optimal nitrogen (Tembo et al., equation 14)</h3>
+<div class="formula"><span class="lbl">FOC and solution</span>
+\[p\beta_1\big[1-\Phi(z^*)\big]=r\ \Rightarrow\ \alpha\equiv1-\Phi=\frac{r}{p\beta_1},\qquad N^*=\frac{\bar P+\sigma Z_\alpha-\beta_0}{\beta_1}.\]
+\(Z_\alpha\) is the upper-\(\alpha\) standard normal quantile (one-tailed: only the top of the plateau distribution matters).</div>
+<ul class="pts">
+<li>Corn: \(p\beta_1/r\approx10\) ⇒ \(\alpha\approx0.1\), \(Z\approx1.28\). Wheat: \(\approx6\).</li>
+<li>So apply N up to where it is needed only about one year in six to ten. Corn's mean switch point is ≈150 lb N, but the recommended rate is ≈180 (up to 200 on good land).</li>
+<li>If \(\alpha=0.5\), \(Z=0\): apply to the mean-plateau kink; expected yield there is below \(\bar P\).</li>
+</ul>
+<div class="exam"><span class="lbl">Exam and philosophy</span>"Risk aversion has to do with utility functions ... We have done nothing of that yet ... it's expected profit maximization that causes us to apply the nitrogen at that level." Never say farmers over-apply N because of risk aversion.</div>
+<p>Nitrogen here is a <b>risk-increasing input</b>: \(\partial\operatorname{var}(Y\mid N)/\partial N&gt;0\), because more N exposes yield to plateau uncertainty.</p>
+<div data-tool="plateau"></div>
+<div class="clarify"><span class="lbl">Clarifying: the Bayesian version used later</span>Assignment 6 writes \(Y_{ij}=\alpha+\beta\min(N_{ij},T_j)+\varepsilon_{ij}\), \(T_j\sim N(\mu_T,\sigma_T^2)\): the random <i>switch point</i> \(T_j\) is a latent variable. A random switch point is a linear transformation of a random plateau, so no Jacobian is needed.</div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>β₀ = 25, β₁ = 0.35, P̄ = 45, σ = 6, p = $6, r = $0.70. Find α, Z_α and N*.</summary><div class="body"><p>\(\alpha=0.70/(6\times0.35)=0.333\). \(Z_\alpha=\Phi^{-1}(0.667)=0.43\). Kink at mean: \((45-25)/0.35=57.1\). \(N^*=(45+6\times0.43-25)/0.35=\)<span class="ans">64.5 lb N</span>. Load these defaults in the lab to check.</p></div></details>
+<details class="sol"><summary>If α = 0.15, what is Z_α?</summary><div class="body"><p>Use the Z table backwards: \(1-0.15=0.85\) ⇒ \(Z\approx\)<span class="ans">1.04</span>. For α = 0.10, 1.28.</p></div></details>
+<details class="sol"><summary>Why do farmers apply N in years when it does nothing?</summary><div class="body"><p>Because the response is asymmetric: missing N in a good year costs \(p\beta_1\) per lb (≈10× the price of N for corn), while unused N costs only \(r\). Expected profit maximization balances these, which means applying N that is needed only about 10% of the time.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Censored normal" data-by="NEDL" href="https://www.youtube.com/watch?v=QS3OAYML2nM">Tobit model explained: censored regression</a>
+<a class="vid" data-tag="Expectation of nonlinear functions" data-by="Steve Brunton" href="https://www.youtube.com/watch?v=GWuAGTjfRs8">Jensen's Inequality</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="0"><div class="stem">In the stochastic plateau, the random term that represents rainfall belongs …</div><ol><li>Inside the min, on the plateau</li><li>On the slope</li><li>Outside the min as an additive error</li><li>On the price</li></ol><div class="why">Rainfall moves the ceiling; additive errors outside the min only shift the curve.</div></div>
+<div class="q" data-a="2"><div class="stem">The FOC for optimal N under a stochastic plateau is:</div><ol><li>\(p\beta_1=r\)</li><li>\(\Phi(z^*)=r/(p\beta_1)\)</li><li>\(p\beta_1[1-\Phi(z^*)]=r\)</li><li>\(E(y)=\bar P\)</li></ol><div class="why">Expected VMP = probability of being on the rising line × \(p\beta_1\).</div></div>
+<div class="q" data-a="1"><div class="stem">For corn with \(p\beta_1/r\approx10\), optimal N is where the plateau binds about …</div><ol><li>50% of years</li><li>90% of years (N is needed only ~10% of years)</li><li>Never</li><li>Every year</li></ol><div class="why">\(\alpha=1-\Phi\approx0.1\).</div></div>
+<div class="q" data-a="3"><div class="stem">Why is N applied above the mean-plateau kink?</div><ol><li>Risk aversion</li><li>Agronomist rules</li><li>Nitrogen is free</li><li>Expected profit maximization with an asymmetric response</li></ol><div class="why">The professor stresses this is not risk aversion.</div></div>
+<div class="q" data-a="0"><div class="stem">Expected yield under a stochastic plateau as a function of N is:</div><ol><li>Smooth, with no kink</li><li>Kinked at the mean plateau</li><li>Linear</li><li>Equal to \(\min(\beta_0+\beta_1N,\bar P)\)</li></ol><div class="why">Averaging kinks at different heights gives a smooth curve.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Stochastic plateau expected yield</div><div class="b">\((1-\Phi(z))a+\Phi(z)\bar P-\sigma\phi(z)\), \(z=(a-\bar P)/\sigma\)</div></div>
+<div class="fc"><div class="f">Optimal N (eq. 14)</div><div class="b">\(N^*=(\bar P+\sigma Z_\alpha-\beta_0)/\beta_1\), \(\alpha=r/(p\beta_1)\)</div></div>
+<div class="fc"><div class="f">What \(\Phi(z)\) means here</div><div class="b">Probability the plateau binds (you are on the plateau)</div></div>
+<div class="fc"><div class="f">Technology change belongs on …</div><div class="b">The plateau (\(P_t=\bar P+\rho t+\delta_t\)), not the intercept</div></div>
+<div class="fc"><div class="f">Risk-increasing input</div><div class="b">\(\partial\operatorname{var}(Y\mid N)/\partial N&gt;0\)</div></div>
+</section>
+</template>
+
+<template data-lesson="c3l3" data-ch="3" data-title="The newsvendor problem and the value of information" data-src="Sep 16 lecture · Stochastic plateau worksheet (IMG_2565)" data-yt="newsvendor problem critical ratio value of information">
+<section data-s="learn">
+<h3>Burritos made in the morning</h3>
+<p>A vendor makes all burritos before demand is known; unsold ones are thrown away. Restaurants and grocers with perishables face the same problem. Students made it too complicated: sales are "a minimum of two things."</p>
+<div class="formula"><span class="lbl">Newsvendor = stochastic plateau with intercept 0 and slope 1</span>
+\[\max_{B\ge0}\ E(\pi)=p\,E\big[\min(B,D)\big]-c\,B,\qquad D\ \text{random}.\]
+Interior optimum: \(F_D(B^*)=1-c/p\) (the critical ratio). Integer \(B\) if needed. Add a salvage value if leftovers have one.</div>
+<div class="clarify"><span class="lbl">Clarifying: compare with the plateau</span>Plateau: yield = min(response line, random plateau), optimal N where \(1-\Phi=r/(p\beta_1)\). Newsvendor: sales = min(quantity made, random demand), optimal B where \(1-F=c/p\). Same math.</div>
+
+<h3>Value of information</h3>
+<div class="formula"><span class="lbl">Definition (worksheet)</span>
+\[VOI=E[\pi^*\mid\text{better information}]-E[\pi^*\mid\text{original information}].\]
+Perfect information: \(E[\max_x\pi(x,\xi)]-\max_xE[\pi(x,\xi)]\).</div>
+<p>You must show <i>where forecast accuracy enters the model</i>, for example demand variance \(\lambda\sigma_D^2\) with \(\lambda&lt;1\) under the better forecast. "If you really read that question, you'll realize it's just giving you everything, and all you have to do is essentially write down in math what the question asked you in words."</p>
+<ul class="pts">
+<li>With better information the optimal amount changes day to day (a bakery makes more before a holiday).</li>
+<li>Same logic values <b>precision agriculture</b>: better prediction of the response at a spot or in a year lets you apply less N and still get higher yield.</li>
+<li>Do not subtract profits evaluated at arbitrary, unoptimized choices; compare <i>optimized</i> expected profits.</li>
+</ul>
+<div data-tool="newsvendor"></div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>p = $8, c = $3, D ~ N(100, 25²). Find B*.</summary><div class="body"><p>Critical ratio \(1-3/8=0.625\), \(z=0.319\), \(B^*=100+25(0.319)=\)<span class="ans">108 burritos</span>.</p></div></details>
+<details class="sol"><summary>Write the value of a forecast that halves the demand SD.</summary><div class="body"><p>\(VOI=\max_B E[\pi(B)\mid D\sim N(\mu,(0.5\sigma)^2)]-\max_B E[\pi(B)\mid D\sim N(\mu,\sigma^2)]\). With normal demand this equals \(p\sigma\phi(z^*)(1-0.5)\).</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Critical ratio" data-by="Piyush Shah" href="https://www.youtube.com/watch?v=8o_7K0vOdUg">Newsvendor Problem 2</a>
+<a class="vid" data-tag="Value of information" data-by="MethodsEcolEvol" href="https://www.youtube.com/watch?v=4N0FFzGYfTs">Value of Information: Calculating the Value of Perfect Information</a>
+<a class="vid" data-tag="EVPI" data-by="Linda Williams" href="https://www.youtube.com/watch?v=FhJe97kllHU">Decision Theory: Expected Value of Perfect Information</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="1"><div class="stem">Sales in the burrito problem equal:</div><ol><li>Burritos made</li><li>min(burritos made, demand)</li><li>Demand</li><li>max(made, demand)</li></ol><div class="why">You cannot sell more than you made or more than people want.</div></div>
+<div class="q" data-a="2"><div class="stem">Optimal quantity satisfies:</div><ol><li>\(F(B^*)=c/p\)</li><li>\(B^*=E(D)\)</li><li>\(F(B^*)=1-c/p\)</li><li>\(B^*=0\)</li></ol><div class="why">Critical ratio: probability demand is below B* equals 1 − c/p.</div></div>
+<div class="q" data-a="0"><div class="stem">The value of information is:</div><ol><li>Optimized expected profit with the information minus optimized expected profit without it</li><li>Profit in a good year minus a bad year</li><li>The price of a forecast</li><li>The variance of demand</li></ol><div class="why">Compare optimized expected profits across information sets.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Newsvendor objective</div><div class="b">\(\max_B\ pE[\min(B,D)]-cB\)</div></div>
+<div class="fc"><div class="f">Critical ratio</div><div class="b">\(F(B^*)=1-c/p\)</div></div>
+<div class="fc"><div class="f">Value of information</div><div class="b">E[π* | better info] − E[π* | original info]</div></div>
+<div class="fc"><div class="f">Newsvendor vs stochastic plateau</div><div class="b">Same structure: min of a choice line and a random ceiling (intercept 0, slope 1).</div></div>
+</section>
+</template>
+
+<template data-review="3">
+<div class="ol"><div class="oq">Write the linear plateau with a min function.</div><div class="oa">\(y=\min(\beta_0+\beta_1N,P)\).</div></div>
+<div class="ol"><div class="oq">Write the alternative switch-point parameterization.</div><div class="oa">\(y=\beta_0+\beta_1\min(N,\bar T)\).</div></div>
+<div class="ol"><div class="oq">What is the continuity restriction?</div><div class="oa">\(\beta_0+\beta_1\bar T=P\).</div></div>
+<div class="ol"><div class="oq">Which biological law motivates the plateau?</div><div class="oa">Liebig's law of the minimum (a limiting factor, usually water).</div></div>
+<div class="ol"><div class="oq">Why can't you set the derivative of a linear plateau to zero?</div><div class="oa">It is not differentiable at the kink; slope is β or 0.</div></div>
+<div class="ol"><div class="oq">Deterministic plateau optimum?</div><div class="oa">The knot if \(p\beta_1&gt;r\); zero if \(p\beta_1&lt;r\).</div></div>
+<div class="ol"><div class="oq">Intercept 25, plateau 40, slope 0.5: optimal N?</div><div class="oa">30 (or 0 if the input does not pay).</div></div>
+<div class="ol"><div class="oq">Why can a quadratic beat a linear plateau on pooled data?</div><div class="oa">The plateau varies by site-year; a single fixed plateau is misspecified.</div></div>
+<div class="ol"><div class="oq">Free parameters in a quadratic plateau?</div><div class="oa">Three (five minus continuity and differentiability).</div></div>
+<div class="ol"><div class="oq">Is the min function an optimization?</div><div class="oa">No; it is just a mathematical function describing yield.</div></div>
+<div class="ol"><div class="oq">What does the PARMS statement do?</div><div class="oa">Sets starting values in PROC NLMIXED.</div></div>
+<div class="ol"><div class="oq">Two common causes of nonconvergence?</div><div class="oa">Poor starting values and poor scaling.</div></div>
+<div class="ol"><div class="oq">What output tells you NLMIXED converged?</div><div class="oa">Gradients near zero (≈10⁻³).</div></div>
+<div class="ol"><div class="oq">How do you deal with local optima?</div><div class="oa">Try other starting values; keep the run with the largest log likelihood.</div></div>
+<div class="ol"><div class="oq">How many RANDOM statements does NLMIXED allow?</div><div class="oa">One.</div></div>
+<div class="ol"><div class="oq">Which way are western Oklahoma yields skewed?</div><div class="oa">Positively (rarely rains, occasional good year).</div></div>
+<div class="ol"><div class="oq">Write the stochastic plateau equation for \(P_t\).</div><div class="oa">\(P_t=\bar P+\delta_t\), \(\delta_t\sim N(0,\sigma_\delta^2)\).</div></div>
+<div class="ol"><div class="oq">Where does the rainfall randomness enter?</div><div class="oa">Through the plateau, inside the min.</div></div>
+<div class="ol"><div class="oq">Where should a technology trend go in a plateau model?</div><div class="oa">On the plateau mean, \(\bar P+\rho t\).</div></div>
+<div class="ol"><div class="oq">Expected yield formula under a normal random plateau?</div><div class="oa">\((1-\Phi(z))a+\Phi(z)\bar P-\sigma\phi(z)\).</div></div>
+<div class="ol"><div class="oq">What does \(\Phi(z)\) represent in that formula?</div><div class="oa">The probability the plateau binds.</div></div>
+<div class="ol"><div class="oq">Can you write \(E[\min(a,P)]=\min(a,E P)\)?</div><div class="oa">No; the expectation does not pass through a nonlinear function.</div></div>
+<div class="ol"><div class="oq">Which classic model is the stochastic plateau like?</div><div class="oa">Tobit (censored normal).</div></div>
+<div class="ol"><div class="oq">FOC for optimal N under a stochastic plateau?</div><div class="oa">\(p\beta_1[1-\Phi(z^*)]=r\).</div></div>
+<div class="ol"><div class="oq">Equation 14 of Tembo et al.?</div><div class="oa">\(N^*=(\bar P+\sigma Z_\alpha-\beta_0)/\beta_1\).</div></div>
+<div class="ol"><div class="oq">Typical \(p\beta_1/r\) for corn, and the implied α?</div><div class="oa">About 10, so α ≈ 0.1 (Z ≈ 1.28).</div></div>
+<div class="ol"><div class="oq">Corn mean switch point vs recommended rate?</div><div class="oa">≈150 lb N vs ≈180 lb N.</div></div>
+<div class="ol"><div class="oq">Why apply N above the average kink?</div><div class="oa">Expected profit maximization with an asymmetric response, not risk aversion.</div></div>
+<div class="ol"><div class="oq">Is N risk increasing or decreasing under a random plateau?</div><div class="oa">Risk increasing.</div></div>
+<div class="ol"><div class="oq">Burrito vendor objective?</div><div class="oa">\(\max_B\ pE[\min(B,D)]-cB\).</div></div>
+<div class="ol"><div class="oq">Newsvendor optimality condition?</div><div class="oa">\(F(B^*)=1-c/p\).</div></div>
+<div class="ol"><div class="oq">Define the value of information.</div><div class="oa">Optimized expected profit with the information minus optimized expected profit without it.</div></div>
+<div class="ol"><div class="oq">How does a better forecast enter the newsvendor model?</div><div class="oa">Through a smaller demand variance, e.g., \(\lambda\sigma^2\) with \(\lambda&lt;1\).</div></div>
+<div class="ol"><div class="oq">Which agricultural technology has the same value-of-information logic?</div><div class="oa">Precision agriculture.</div></div>
+</template>

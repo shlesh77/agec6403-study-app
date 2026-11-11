@@ -1,0 +1,344 @@
+
+<!-- ===================== CHAPTER 8 ===================== -->
+<template data-chapter="8" data-part="II. Decision making under risk" data-title="Numerical integration and direct expected-utility maximization" data-dates="Oct 21 · Oct 23 · Oct 26 · Oct 30 review" data-color="8"></template>
+
+<template data-lesson="c8l1" data-ch="8" data-title="One formula, three methods: empirical, Monte Carlo, Gaussian quadrature" data-src="Oct 21 · Oct 23 · Oct 26 lectures · IMG_2810–2812 · Oct 30 review" data-yt="Gaussian quadrature Monte Carlo integration expected value">
+<section data-s="learn">
+<h3>Why integrate numerically?</h3>
+<p>Expected utility with a continuous outcome is an integral, and most integrals cannot be solved analytically. You already used numerical integration: PROC NLMIXED integrates random effects out of the likelihood with Gaussian quadrature (QPOINTS).</p>
+<div class="formula"><span class="lbl">The weighted-sum template</span>
+\[E[g(X)]=\int g(x)f(x)\,dx\ \approx\ \sum_{j=1}^{K}p_j\,g(x_j),\qquad \sum_jp_j=1.\]</div>
+<div class="scrollx"><table class="t"><thead><tr><th>Method</th><th>Points \(x_j\)</th><th>Weights \(p_j\)</th></tr></thead><tbody>
+<tr><td>Empirical distribution</td><td>The observed outcomes</td><td>Usually \(1/n\); repeated values aggregate</td></tr>
+<tr><td>Monte Carlo</td><td>Random draws from the assumed or fitted distribution</td><td>Usually \(1/K\)</td></tr>
+<tr><td>Gaussian quadrature</td><td>Chosen nodes that match moments</td><td>Chosen weights, generally unequal</td></tr></tbody></table></div>
+<div class="exam"><span class="lbl">Oct 30 review</span>Be able to identify the nodes and weights for each method, explain moment matching, and evaluate a supplied weighted sum. Reconstructing the whole quadrature algorithm under exam conditions was downplayed.</div>
+<ul class="pts">
+<li>Historical weights need not be equal if another weighting is justified; keep paired observations together to preserve dependence.</li>
+<li>Drawing from a fitted normal is a modeling assumption, not the same as using the empirical distribution.</li>
+<li>Monte Carlo needs enough draws (error shrinks like \(1/\sqrt K\)); fix a seed for reproducibility.</li>
+<li>Accuracy depends on the integrand, the rule and the effort. Trapezoidal and Simpson rules are other options. Check stability when integration sits inside an optimization.</li>
+</ul>
+
+<h3>Gaussian quadrature: matching moments</h3>
+<div class="formula"><span class="lbl">K nodes match raw moments through degree 2K − 1</span>
+\[\sum_{j=1}^{K}p_jx_j^m=E[X^m],\qquad m=0,1,\dots,2K-1.\]
+\(m=0\) is \(\sum p_j=1\): \(2K\) equations including normalization (\(2K-1\) positive-order moments). Five nodes match through the 9th moment.</div>
+<p>Construction taught Oct 26: (1) get the target raw moments; (2) solve moment equations for the coefficients of a degree-\(K\) orthogonal polynomial; (3) its roots are the nodes; (4) solve linear equations for the weights; (5) verify the moments.</p>
+<div class="formula"><span class="lbl">Two-node example (mean 10, variance 200, normal)</span>
+\(m_1=10\), \(m_2=10^2+200=300\), \(m_3=10^3+3(10)(200)=7000\). For \(q(x)=x^2+c_1x+c_0\): \(m_2+c_1m_1+c_0=0\) and \(m_3+c_1m_2+c_0m_1=0\) give \(c_1=-20\), \(c_0=-100\).
+\[q(x)=x^2-20x-100,\qquad x_{1,2}=10\pm\sqrt{200}=-4.142,\ 24.142,\qquad p_1=p_2=\tfrac12.\]
+Do not confuse variance 200 with SD 200.</div>
+<div class="formula"><span class="lbl">Normal shortcuts</span>2 nodes: \(\mu\pm\sigma\), weights ½. 3 nodes: \(\mu+\sigma\{-\sqrt3,0,\sqrt3\}\), weights \(1/6,2/3,1/6\). Normal raw moments: \(E X=\mu\), \(EX^2=\mu^2+\sigma^2\), \(EX^3=\mu^3+3\mu\sigma^2\).</div>
+<div class="warn"><span class="lbl">Matching moments ≠ exact for everything</span>Exactness holds for polynomials up to degree \(2K-1\). A nonlinear utility like \(-e^{-rx}\) is only approximated (try K = 1, 2, 3 in the lab).</div>
+<div data-tool="quad"></div>
+<div class="clarify"><span class="lbl">Clarifying: many random variables</span>Tensor-product quadrature in \(d\) dimensions needs \(K^d\) points; Monte Carlo avoids that grid growth by simulating the dependent vector directly. Correct dependence matters.</div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Points and weights (0.4, 3), (0.6, 5). Approximate E(X²).</summary><div class="body"><p>\(0.4(9)+0.6(25)=\)<span class="ans">18.6</span>. Do not square the weighted mean (4.2² = 17.64).</p></div></details>
+<details class="sol"><summary>Monte Carlo draws 3, 0, 3. Approximate E(X²).</summary><div class="body"><p>\((9+0+9)/3=\)<span class="ans">6</span>.</p></div></details>
+<details class="sol"><summary>How many moments does a 3-node Gaussian rule match?</summary><div class="body"><p>Through degree 5 (m = 0,…,5): six equations including normalization.</p></div></details>
+<details class="sol"><summary>SAS Monte Carlo template for E[g(X)].</summary><div class="body"><pre class="code">data draws;
+  call streaminit(2026);
+  do j = 1 to 100000;
+    x = rand('normal', mu, sd);   /* SD, not variance */
+    value = g_of_x;               /* the integrand */
+    output;                       /* forgetting this loses draws */
+  end;
+run;
+proc means data=draws mean stderr; var value; run;</pre></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Start here" data-by="Jeffrey Chasnov" href="https://www.youtube.com/watch?v=w2xjlPwYock">Gaussian Quadrature (Numerical Methods for Engineers, Lecture 40)</a>
+<a class="vid" data-tag="Lecture" data-by="Tepole Lab" href="https://www.youtube.com/watch?v=Do1NNj4uoMs">Gauss quadrature (ME489 Lecture 8)</a>
+<a class="vid" data-tag="Monte Carlo" data-by="Foundations of Data Science" href="https://www.youtube.com/watch?v=ic6Eia4a2gw">Monte Carlo integration</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="2"><div class="stem">In Monte Carlo integration, the weights are usually:</div><ol><li>Chosen to match moments</li><li>The observed frequencies</li><li>\(1/K\) for each draw</li><li>Proportional to the integrand</li></ol><div class="why">Each random draw gets equal weight.</div></div>
+<div class="q" data-a="1"><div class="stem">A K-node Gaussian quadrature rule matches raw moments through degree:</div><ol><li>K</li><li>2K − 1</li><li>K − 1</li><li>2K + 1</li></ol><div class="why">2K equations including normalization.</div></div>
+<div class="q" data-a="0"><div class="stem">Two-node rule for N(10, 200):</div><ol><li>\(10\pm\sqrt{200}\), weights ½</li><li>\(10\pm200\), weights ½</li><li>0 and 20, weights ½</li><li>\(10\pm\sqrt{200}\), weights ⅓ and ⅔</li></ol><div class="why">Nodes μ ± σ, σ = √200 ≈ 14.14.</div></div>
+<div class="q" data-a="3"><div class="stem">Points (0.4, 3), (0.6, 5): \(E(X^2)\approx\)</div><ol><li>17.64</li><li>16</li><li>34</li><li>18.6</li></ol><div class="why">Weight the squared points.</div></div>
+<div class="q" data-a="2"><div class="stem">Why prefer Monte Carlo in many dimensions?</div><ol><li>It is exact</li><li>It needs no distribution</li><li>Tensor-product quadrature needs \(K^d\) points</li><li>It never needs a seed</li></ol><div class="why">Grid growth explodes with dimension.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Numerical integration template</div><div class="b">\(E[g(X)]\approx\sum_jp_jg(x_j)\)</div></div>
+<div class="fc"><div class="f">Empirical vs Monte Carlo vs quadrature points</div><div class="b">Observed data / random draws / chosen moment-matching nodes</div></div>
+<div class="fc"><div class="f">Moments matched by K-node Gaussian quadrature</div><div class="b">Degrees 0 through 2K − 1</div></div>
+<div class="fc"><div class="f">Quadrature construction steps</div><div class="b">Moments → orthogonal polynomial coefficients → roots = nodes → solve for weights → verify</div></div>
+<div class="fc"><div class="f">Normal 3-node rule</div><div class="b">\(\mu+\sigma\{-\sqrt3,0,\sqrt3\}\), weights 1/6, 2/3, 1/6</div></div>
+</section>
+</template>
+
+<template data-lesson="c8l2" data-ch="8" data-title="Direct expected-utility maximization and dependence" data-src="Oct 21 · Oct 23 (bull vs steer) · Oct 26 (log-yield model) · Oct 30 (copulas)" data-yt="direct expected utility maximization fertilizer risk aversion copula">
+<section data-s="learn">
+<h3>Put the integral inside the decision</h3>
+<div class="formula"><span class="lbl">Direct expected-utility maximization</span>
+\[\max_{a\in A}\int U\big(\pi(a,x)\big)f(x)\,dx\ \approx\ \max_{a\in A}\sum_jp_j\,U\big(\pi(a,x_j)\big).\]
+Average the evaluated utilities. Do not put the weighted mean profit inside the nonlinear utility.</div>
+<p>This is the "continuous choice, not normal" box of the flowchart (associated with Bruce McCarl). It is part of the class; quadratic programming is not.</p>
+
+<h3>Log-yield nitrogen decision (Oct 26)</h3>
+<div class="formula"><span class="lbl">Model and objective with CARA utility</span>
+\[\log Y=\alpha_0+\alpha_1\log N+\alpha_2(\log N)^2+\varepsilon,\]
+\[\max_{N&gt;0}\ \sum_jp_j\Big[-\exp\Big\{-r\big(P\,e^{\alpha_0+\alpha_1\log N+\alpha_2(\log N)^2+x_j}-cN\big)\Big\}\Big],\]
+with \((x_j,p_j)\) the nodes and weights for \(\varepsilon\).</div>
+<ul class="pts"><li>Require \(N&gt;0\) for the logs. Keep any random coefficients and dependence in the real model.</li>
+<li>The lognormal mean correction \(\sigma^2/2\) gives the <i>mean yield</i>; it does not replace integrating the nonlinear utility over yield risk.</li></ul>
+
+<h3>Define the action correctly: bull vs steer (Oct 23)</h3>
+<p>Castration changes both the payoff (weight loss, different price) and the comparison. Comparing observed weights alone does not specify the counterfactual decision. Write the payoff under each action, then integrate.</p>
+<div class="prof"><span class="lbl">In class (Oct 21)</span>Three economic principles: incentives matter, resources are scarce, decisions require marginal analysis. Communicate methods clearly within the paper's page limits.</div>
+
+<h3>Dependence and copulas (Oct 30, brief)</h3>
+<div class="formula"><span class="lbl">Sklar's idea</span>\(H(x,y)=C\big(F_X(x),F_Y(y)\big)\): a copula \(C\) links marginal CDFs into a joint distribution, separating marginal behavior from dependence. Gaussian copula: \(C_\rho(u,v)=\Phi_\rho(\Phi^{-1}(u),\Phi^{-1}(v))\).</div>
+<ul class="pts"><li>Copulas can capture <b>tail dependence</b> (prices or yields crashing together) that ordinary correlation misses; useful for non-normal correlated prices or yields.</li>
+<li>Simulation: draw dependent uniforms from the copula → transform with inverse marginal CDFs → evaluate the payoff → average.</li>
+<li>Formal IFM estimation (marginals first, then dependence) is an extension beyond class.</li></ul>
+<div class="clarify"><span class="lbl">Clarifying: old-exam payoff trap</span>\(\min(\min(P_1,P_2)-K,0)\) is never positive; it is not the usual \(\max(\cdot,0)\) option payoff. Preserve the question's payoff exactly.</div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Two-node quadrature for ε ~ N(0, 0.04) in the log-yield model. What are the nodes and weights?</summary><div class="body"><p>σ = 0.2: nodes ±0.2, weights ½ each. Expected utility at a given N = ½U(π at ε = −0.2) + ½U(π at ε = +0.2). Repeat over a grid of N and pick the maximum.</p></div></details>
+<details class="sol"><summary>A student writes \(\max_N U\big(\sum_jp_j\pi(N,x_j)\big)\). What is wrong?</summary><div class="body"><p>That is utility of expected profit. For nonlinear U the correct objective is \(\sum_jp_jU(\pi(N,x_j))\): probabilities go outside each utility evaluation.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Copulas, no formulas" data-by="Dirty Quant" href="https://www.youtube.com/watch?v=WFEzkoK7tsE">A Simple Introduction to Copulas</a>
+<a class="vid" data-tag="Copula basics" data-by="Paul Sweeting" href="https://www.youtube.com/watch?v=b6aZJuwE3Cs">Copulas: learning the basics</a>
+<a class="vid" data-tag="Monte Carlo" data-by="Foundations of Data Science" href="https://www.youtube.com/watch?v=ic6Eia4a2gw">Monte Carlo integration</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="0"><div class="stem">Direct expected-utility maximization approximates the objective by:</div><ol><li>\(\sum_jp_jU(\pi(a,x_j))\)</li><li>\(U(\sum_jp_j\pi(a,x_j))\)</li><li>\(\sum_jU(p_j)\pi\)</li><li>\(E(\pi)-\lambda\operatorname{var}(\pi)\) always</li></ol><div class="why">Average utilities at the nodes.</div></div>
+<div class="q" data-a="2"><div class="stem">The lognormal mean correction σ²/2:</div><ol><li>Replaces numerical integration of utility</li><li>Is only for Bayesian models</li><li>Gives mean yield but does not integrate utility over yield risk</li><li>Is the CARA risk premium</li></ol><div class="why">Mean yield and expected utility are different objects.</div></div>
+<div class="q" data-a="1"><div class="stem">A copula:</div><ol><li>Is a marginal distribution</li><li>Links marginal CDFs into a joint distribution</li><li>Is a quadrature rule</li><li>Measures risk aversion</li></ol><div class="why">It separates dependence from the marginals.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Direct EU maximization objective</div><div class="b">\(\max_a\sum_jp_jU(\pi(a,x_j))\)</div></div>
+<div class="fc"><div class="f">Copula (Sklar)</div><div class="b">\(H(x,y)=C(F_X(x),F_Y(y))\)</div></div>
+<div class="fc"><div class="f">Tail dependence</div><div class="b">Joint extremes that ordinary correlation can miss</div></div>
+<div class="fc"><div class="f">Bull vs steer lesson</div><div class="b">An action changes the payoff and the counterfactual; specify both before integrating.</div></div>
+</section>
+</template>
+
+<template data-review="8">
+<div class="ol"><div class="oq">Why do we need numerical integration?</div><div class="oa">Most expected-utility and likelihood integrals have no analytical solution.</div></div>
+<div class="ol"><div class="oq">Where did you already use quadrature?</div><div class="oa">PROC NLMIXED integrating random effects (QPOINTS).</div></div>
+<div class="ol"><div class="oq">Write the weighted-sum template.</div><div class="oa">\(E[g(X)]\approx\sum_jp_jg(x_j)\).</div></div>
+<div class="ol"><div class="oq">Points and weights for the empirical method?</div><div class="oa">Observed outcomes; usually 1/n.</div></div>
+<div class="ol"><div class="oq">Points and weights for Monte Carlo?</div><div class="oa">Random draws; 1/K.</div></div>
+<div class="ol"><div class="oq">Points and weights for Gaussian quadrature?</div><div class="oa">Chosen nodes and unequal weights that match moments.</div></div>
+<div class="ol"><div class="oq">How many moments does K-node Gaussian quadrature match?</div><div class="oa">Degrees 0 through 2K − 1.</div></div>
+<div class="ol"><div class="oq">With five nodes, the highest moment matched?</div><div class="oa">The ninth.</div></div>
+<div class="ol"><div class="oq">List the quadrature construction steps.</div><div class="oa">Moments → orthogonal polynomial → roots (nodes) → weights → verify.</div></div>
+<div class="ol"><div class="oq">Two-node rule for mean 10, variance 200?</div><div class="oa">10 ± √200 (−4.14, 24.14), weights ½.</div></div>
+<div class="ol"><div class="oq">Normal third raw moment?</div><div class="oa">\(\mu^3+3\mu\sigma^2\).</div></div>
+<div class="ol"><div class="oq">Normal 3-node rule?</div><div class="oa">\(\mu+\sigma\{-\sqrt3,0,\sqrt3\}\), weights 1/6, 2/3, 1/6.</div></div>
+<div class="ol"><div class="oq">Does moment matching make every expectation exact?</div><div class="oa">No; only polynomials up to degree 2K − 1.</div></div>
+<div class="ol"><div class="oq">(0.4, 3), (0.6, 5): E(X²)?</div><div class="oa">18.6.</div></div>
+<div class="ol"><div class="oq">Monte Carlo draws 3, 0, 3: E(X²)?</div><div class="oa">6.</div></div>
+<div class="ol"><div class="oq">How does Monte Carlo error shrink?</div><div class="oa">Like \(1/\sqrt K\).</div></div>
+<div class="ol"><div class="oq">Why fix a seed?</div><div class="oa">Reproducible results.</div></div>
+<div class="ol"><div class="oq">Problem with tensor-product quadrature?</div><div class="oa">\(K^d\) points in d dimensions.</div></div>
+<div class="ol"><div class="oq">Common SAS Monte Carlo bug?</div><div class="oa">Forgetting OUTPUT inside the loop (and using variance in rand()).</div></div>
+<div class="ol"><div class="oq">Direct EU maximization objective?</div><div class="oa">\(\max_a\sum_jp_jU(\pi(a,x_j))\).</div></div>
+<div class="ol"><div class="oq">Log-yield model profit uses yield as?</div><div class="oa">The exponential of the log-yield expression.</div></div>
+<div class="ol"><div class="oq">Does the σ²/2 lognormal correction handle risk?</div><div class="oa">No; it only gives mean yield.</div></div>
+<div class="ol"><div class="oq">Lesson of the bull vs steer example?</div><div class="oa">Specify the payoff and counterfactual of each action.</div></div>
+<div class="ol"><div class="oq">Three economic principles from Oct 21?</div><div class="oa">Incentives matter; resources are scarce; marginal analysis.</div></div>
+<div class="ol"><div class="oq">What is a copula?</div><div class="oa">A function linking marginal CDFs into a joint distribution.</div></div>
+<div class="ol"><div class="oq">What can copulas capture that correlation misses?</div><div class="oa">Tail dependence.</div></div>
+<div class="ol"><div class="oq">How do you simulate with a copula?</div><div class="oa">Dependent uniforms → inverse marginal CDFs → payoff → average.</div></div>
+</template>
+
+<!-- ===================== CHAPTER 9 ===================== -->
+<template data-chapter="9" data-part="V. The term paper and presentation" data-title="Research writing, tables and figures" data-dates="Aug 31 · Sep 2 · Sep 9 · Sep 18 · Sep 25 · Sep 30 · Oct 12" data-color="9"></template>
+
+<template data-lesson="c9l1" data-ch="9" data-title="Figures and tables in the class style" data-src="Aug 31 (Diebold, figures) · Sep 2 · Sep 4 · Sep 18 · table handout IMG_2527–2528" data-yt="data ink ratio chart junk Tufte">
+<section data-s="learn">
+<h3>Figures</h3>
+<div class="prof"><span class="lbl">In class (Aug 31)</span>"This is not really my personal preference. This is actually good science." Default figures from Claude and Excel are poor; Claude's faint gridlines with no axes are "essentially a watermark" of AI.</div>
+<ul class="pts">
+<li>High information-to-ink ratio: no ink on anything that communicates nothing. Remove gridlines, shading, boxes around the plot, decorations, unnecessary point markers. Keep the axes ("we need axes"); a zero line counts as an axis.</li>
+<li>Label both axes with variables and <b>units</b>; scale axes to show movement but avoid the "gee-whiz graph" that makes a small change look huge.</li>
+<li>Label lines directly instead of a legend; avoid undefined abbreviations (WTI, VWAP).</li>
+<li>As a general rule, <b>no more than five things on a figure</b>.</li>
+<li>Readable font sizes (Claude's are often too small); save at <b>600 dpi</b>.</li>
+<li>Don't rely on color alone: about 8% of U.S. males are color-blind and many journals print in grayscale.</li>
+<li>Title <b>below</b> the figure, starting "Figure 1." and typed in Word, not drawn by R. No double titles. Say what is in the figure, not what it shows ("shows a cycle" is not appropriate). Source below the title; notes after. Interpretation goes in the text.</li>
+<li>Need exact values like 4.83? "Do a table."</li>
+</ul>
+
+<h3>Tables</h3>
+<ul class="pts">
+<li>Title <b>above</b> the table in bold, in title case, describing what is in the table.</li>
+<li>Three horizontal rules, no vertical rules (Word Insert Table).</li>
+<li>Column titles in title case and bottom-aligned; first-column title left-aligned, other column titles centered; row items in sentence case.</li>
+<li>Decimal points aligned; units identified (first column or an extra column, not the title).</li>
+<li>Define abbreviations (LS means, CF, letters a, b), define asterisks, and put the asterisk on the parameter estimate, not the p-value.</li>
+<li>Every table is referred to in the text. "I like 'significance tests,' not 'significant tests.'"</li>
+</ul>
+<div class="exam"><span class="lbl">Exam pattern</span>"List two (or three) changes to make this figure conform to good graphical style" and "find the problems in this table" appear on the old exams. The hog-inventory figure had dual y-axes, shaded background, gridlines, a legend box with markers, rotated labels, a misspelling ("Oklahaoma"), a title inside the plot and a border.</div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Old exam: "Figure 7. Producer price of wheat is between 2000 and 2008." List changes.</summary><div class="body"><ul class="pts"><li>Remove gridlines; label the y-axis with units ($/tonne).</li><li>Reword the title to say what is in the figure (wheat producer prices for seven countries, 2000–2008).</li><li>Don't italicize "Figure 7"; align tick marks with year labels.</li><li>Seven series is too many: more than five things on a figure.</li></ul></div></details>
+<details class="sol"><summary>Name four things wrong with a typical Claude R figure.</summary><div class="body"><p>Faint gridlines and no axes; legend box instead of direct labels; title drawn inside the plot (double title with the Word caption); small fonts; low resolution.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Data-ink ratio" data-by="Tomasz Przechlewski" href="https://www.youtube.com/watch?v=JIMUzJzqaA8">Data to Ink Ratio (Tufte principle of Data Visualisation)</a>
+<a class="vid" data-tag="Show the data" data-by="Playfair Data" href="https://www.youtube.com/watch?v=pCp0a5_YIWE">Show the Data: Maximize the Data Ink Ratio</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="1"><div class="stem">Where does a figure title go in the class style?</div><ol><li>Above the figure, drawn by R</li><li>Below the figure, typed in Word, starting "Figure 1."</li><li>Inside the plot area</li><li>In a footnote</li></ol><div class="why">Tables: title above. Figures: title below.</div></div>
+<div class="q" data-a="3"><div class="stem">Maximum number of items on a figure, as a general rule?</div><ol><li>Two</li><li>Ten</li><li>No limit</li><li>Five</li></ol><div class="why">"As a general rule, you don't want more than five things on a figure."</div></div>
+<div class="q" data-a="0"><div class="stem">How many horizontal rules in a class-style table?</div><ol><li>Three, and no vertical rules</li><li>One</li><li>One per row</li><li>Three plus vertical rules</li></ol><div class="why">Top, below the header, bottom.</div></div>
+<div class="q" data-a="2"><div class="stem">Where does the significance asterisk go?</div><ol><li>On the p-value</li><li>On the variable name</li><li>On the parameter estimate</li><li>In the title</li></ol><div class="why">From the grazing-table handout.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Figure title placement</div><div class="b">Below, "Figure 1." typed in Word; source then notes below it</div></div>
+<div class="fc"><div class="f">Table title placement</div><div class="b">Above, bold, title case</div></div>
+<div class="fc"><div class="f">Figure resolution</div><div class="b">600 dpi</div></div>
+<div class="fc"><div class="f">Three things to delete from default figures</div><div class="b">Gridlines, boxes/borders, legends (use direct labels)</div></div>
+<div class="fc"><div class="f">Table rules</div><div class="b">Three horizontal lines, no vertical lines, decimals aligned, units shown</div></div>
+</section>
+</template>
+
+<template data-lesson="c9l2" data-ch="9" data-title="Writing the paper: question, abstract, introduction, theory, data, procedure" data-src="Sep 2 · Sep 9 · Sep 18 · Sep 25 · Sep 30 · Oct 2 · Oct 12 lectures · Assignments 2–6" data-yt="how to write introduction research paper economics contribution">
+<section data-s="learn">
+<h3>Research question vs objective</h3>
+<ul class="pts"><li>"The research question really is relating more to the problem than the objective." Most students just rewrote their objective as a question.</li><li>The objective is narrower and more exact about what you will accomplish, close to the methods but with no procedures in it.</li><li>Assignment 2 rule: one sentence, phrased as a question, not yes/no, with an answer that is not already known.</li></ul>
+
+<h3>Abstract</h3>
+<ul class="pts"><li>One sentence each on problem, objective and methods; a couple on results; one on implications. In tight limits, combine problem and purpose. "In AgEcon it's important to have results in your abstract."</li><li>No empty "this has important policy implications" sentence (an editor complained; AI always adds it). Say the specific implication or leave it out.</li></ul>
+
+<h3>Introduction: "the most important part of the paper"</h3>
+<ul class="pts"><li>Editors desk-reject about half of submissions after reading the abstract and first page: "if you don't sell the editor that you've done something useful in that amount of time, you're out."</li><li>Purpose statement in the first or second paragraph, then broaden to the literature, the contribution and what the paper does. He often deletes students' opening background paragraph.</li><li>A reader should finish knowing: why am I doing this, who cares, what's new, what's known, how exactly. "Our style is going to be simple ... We're not trying to impress people with a lot of fancy words."</li><li>Synthesize literature ("this set of papers used these methods ... we go beyond it"), not one sentence per paper. A typical paper has 20–30 citations.</li><li>Em dashes are read as a sign of AI. The "research gap" formula's list of three has become an AI tell.</li></ul>
+<div class="formula"><span class="lbl">A contribution must be</span>(1) <b>original</b> (argued with literature), (2) <b>important</b> (argue people care), (3) <b>correct</b> (even his accepted papers had text numbers that did not match tables).</div>
+
+<h3>Theory section (term paper requirement)</h3>
+<div class="prof"><span class="lbl">In class (Sep 25)</span>"I want the theory section to include an optimization model. I also want you to state hypotheses as part of your theory section, which you usually won't see in journal articles." Not random utility theory copied from a book, not a description of methods: "we're talking about theory." About two double-spaced pages. On Oct 2: many hypotheses "didn't really flow from the theoretical model," and there were too many.</div>
+<p>Why theory: statistics gives correlations; arguing causality needs economic theory, which also tells you how to specify and interpret the econometric model. Theory need not be fancy math.</p>
+
+<h3>Data and procedure sections</h3>
+<ul class="pts"><li><b>Data</b> (about a page): sources in the references, with website and date accessed when relevant.</li><li><b>Procedure</b> (two to five pages): "Methodology, to me, is a study of methods ... I want it entitled procedure." Write DGPs and equations following Chapter 1.</li></ul>
+
+<h3>Titles, keywords, outlets and AI</h3>
+<ul class="pts"><li>Avoid empty title words ("analysis," "evaluation"). Journal titles carry the key phrases people search; keywords should not repeat title words. "The game in academics is still to get citations."</li><li>Name a target journal (AJAE, AEPP, JARE, Food Policy) and an alternative: rejections are normal. "I'm really big on submitting stuff." SAEA meets in Oklahoma City around Feb 1 (250-word abstract, ~80% accepted).</li><li>Claude's priority order: what is in the prompt, then positive instructions, then negative ones. Store long prompts. Proofread with AI selectively so the text does not get "reinfected." Orwell's essay on political language: big words hide a lack of substance.</li><li>Machine learning targets prediction of y; econometrics targets parameters. For optimal N, ML does not work well even if it predicts better.</li></ul>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Turn "Objective: estimate financial ratios for U.S. agriculture from 1980 to 2025" into a research question.</summary><div class="body"><p>"What measures of financial health should we be looking at for agriculture today?" (relates to the problem; not yes/no; answer unknown).</p></div></details>
+<details class="sol"><summary>Rewrite: "This research has important implications for the futures industry."</summary><div class="body"><p>Something specific, e.g., "This research confirms the value of basis and futures markets in allocating grain over time." Or delete it.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Introductions" data-by="Research Masterminds" href="https://www.youtube.com/watch?v=2nGORZo2ZAU">How to write an introduction to a research paper</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="2"><div class="stem">What must the term paper's theory section include?</div><ol><li>A literature review</li><li>The regression output</li><li>An optimization model and stated hypotheses</li><li>Random utility theory from a textbook</li></ol><div class="why">His explicit requirement.</div></div>
+<div class="q" data-a="0"><div class="stem">What should the methods section be titled?</div><ol><li>Procedure</li><li>Methodology</li><li>Methods and Materials</li><li>Analysis</li></ol><div class="why">"Methodology is a study of methods."</div></div>
+<div class="q" data-a="1"><div class="stem">A contribution must be:</div><ol><li>Long, technical, novel</li><li>Original, important, correct</li><li>Funded, published, cited</li><li>Simple, short, catchy</li></ol><div class="why">The three requirements from Oct 12.</div></div>
+<div class="q" data-a="3"><div class="stem">Where does the purpose statement go in a modern introduction?</div><ol><li>The last paragraph</li><li>After the literature review</li><li>In the conclusion</li><li>The first or second paragraph</li></ol><div class="why">The old style built slowly; now state the purpose early.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Research question vs objective</div><div class="b">Question relates to the problem; objective is narrower and exact, no procedures.</div></div>
+<div class="fc"><div class="f">Term paper theory section</div><div class="b">Optimization model + hypotheses that flow from it; ~2 double-spaced pages</div></div>
+<div class="fc"><div class="f">Contribution</div><div class="b">Original, important, correct</div></div>
+<div class="fc"><div class="f">Section name for methods</div><div class="b">Procedure (not Methodology)</div></div>
+<div class="fc"><div class="f">Abstract recipe</div><div class="b">Problem, objective, methods, results (2 sentences), specific implication</div></div>
+</section>
+</template>
+
+<template data-review="9">
+<div class="ol"><div class="oq">Ratio to maximize in a figure?</div><div class="oa">Information to ink.</div></div>
+<div class="ol"><div class="oq">What do you delete from default figures?</div><div class="oa">Gridlines, shading, boxes, legend boxes, unneeded markers.</div></div>
+<div class="ol"><div class="oq">What must axis labels include?</div><div class="oa">Variable names and units.</div></div>
+<div class="ol"><div class="oq">What is a gee-whiz graph?</div><div class="oa">An axis scaled so a small change looks huge.</div></div>
+<div class="ol"><div class="oq">Legend or direct labels?</div><div class="oa">Direct labels on the lines.</div></div>
+<div class="ol"><div class="oq">Max items on a figure?</div><div class="oa">About five.</div></div>
+<div class="ol"><div class="oq">Figure resolution?</div><div class="oa">600 dpi.</div></div>
+<div class="ol"><div class="oq">Figure title placement?</div><div class="oa">Below, "Figure 1." typed in Word.</div></div>
+<div class="ol"><div class="oq">Table title placement?</div><div class="oa">Above, bold, title case.</div></div>
+<div class="ol"><div class="oq">How many rules in a table?</div><div class="oa">Three horizontal, no vertical.</div></div>
+<div class="ol"><div class="oq">Where does the asterisk go?</div><div class="oa">On the parameter estimate.</div></div>
+<div class="ol"><div class="oq">When should you use a table instead of a figure?</div><div class="oa">When exact values matter.</div></div>
+<div class="ol"><div class="oq">Research question vs objective?</div><div class="oa">Question tied to the problem; objective narrower, exact, no procedures.</div></div>
+<div class="ol"><div class="oq">Abstract structure?</div><div class="oa">Problem, objective, methods, results, specific implications.</div></div>
+<div class="ol"><div class="oq">What sentence should you drop from abstracts?</div><div class="oa">The vague "important policy implications" sentence.</div></div>
+<div class="ol"><div class="oq">Why is the introduction so important?</div><div class="oa">Editors decide after the abstract and first page; about half are desk-rejected.</div></div>
+<div class="ol"><div class="oq">Where does the purpose statement go?</div><div class="oa">First or second paragraph.</div></div>
+<div class="ol"><div class="oq">How many citations does a typical AgEcon paper have?</div><div class="oa">About 20–30.</div></div>
+<div class="ol"><div class="oq">Three features of a contribution?</div><div class="oa">Original, important, correct.</div></div>
+<div class="ol"><div class="oq">What must the theory section contain?</div><div class="oa">An optimization model and hypotheses.</div></div>
+<div class="ol"><div class="oq">Why theory before econometrics?</div><div class="oa">To argue causality and to guide specification and interpretation.</div></div>
+<div class="ol"><div class="oq">Title for the methods section?</div><div class="oa">Procedure.</div></div>
+<div class="ol"><div class="oq">Length of data and procedure sections?</div><div class="oa">About a page; two to five pages.</div></div>
+<div class="ol"><div class="oq">Should keywords repeat the title?</div><div class="oa">No.</div></div>
+<div class="ol"><div class="oq">Claude's instruction priority?</div><div class="oa">Prompt content, positive instructions, negative instructions.</div></div>
+<div class="ol"><div class="oq">ML vs econometrics focus?</div><div class="oa">ML: prediction of y. Econometrics: parameters.</div></div>
+</template>
+
+<!-- ===================== CHAPTER 10 ===================== -->
+<template data-chapter="10" data-part="III–IV. Remaining syllabus topics" data-title="Coming up: spatial, frontier, duality and more" data-dates="Syllabus parts III–IV · not in the class record through Oct 30" data-color="10" data-preview></template>
+
+<template data-lesson="c10l1" data-ch="10" data-title="Preview: spatial models, frontier functions and duality" data-src="Syllabus parts III–IV · standard textbook material, not yet from lectures" data-yt="stochastic frontier analysis spatial econometrics Hotelling lemma">
+<section data-s="learn">
+<div class="exam"><span class="lbl">Read this first</span>The class record available when this app was built ends on October 30. These syllabus topics had not appeared in lecture yet, so this lesson gives standard background only. Replace or extend it with your own notes once they are taught (see "How to add content" under More).</div>
+<h3>Spatial models (Part III)</h3>
+<p>Field and yield-monitor data are spatially correlated: nearby plots share soil and water. Ignoring it gives standard errors that are too small and can bias estimates of the N response.</p>
+<div class="formula"><span class="lbl">Two common forms</span>Spatial lag: \(\mathbf y=\rho\mathbf W\mathbf y+\mathbf X\boldsymbol\beta+\boldsymbol\varepsilon\). Spatial error: \(\mathbf y=\mathbf X\boldsymbol\beta+\mathbf u,\ \mathbf u=\lambda\mathbf W\mathbf u+\boldsymbol\varepsilon\). \(\mathbf W\) is a neighbor (weights) matrix. Moran's I tests for spatial autocorrelation.</div>
+<p>Links to class: the posterior predictive distribution can fill deleted yield-monitor points; R-hat guidelines are hard to meet with many spatial parameters (Sep 30).</p>
+<h3>Frontier functions (Part IV)</h3>
+<div class="formula"><span class="lbl">Stochastic production frontier</span>\(\ln y_i=f(\mathbf x_i;\boldsymbol\beta)+v_i-u_i\), \(v_i\sim N(0,\sigma_v^2)\) noise, \(u_i\ge0\) inefficiency (half-normal or exponential). Technical efficiency \(TE_i=e^{-u_i}\).</div>
+<p>The composed error separates bad luck (\(v\)) from inefficiency (\(u\)). A test of \(\sigma_u^2=0\) is a boundary test, like Chapter 4.</p>
+<h3>Duality (Part IV)</h3>
+<div class="formula"><span class="lbl">Profit function and Hotelling's lemma</span>\(\pi(p,\mathbf w)=\max_{\mathbf x}\ p f(\mathbf x)-\mathbf w'\mathbf x\). Then \(\partial\pi/\partial p=y^*(p,\mathbf w)\) (supply) and \(\partial\pi/\partial w_j=-x_j^*(p,\mathbf w)\) (input demand). Cost function: Shephard's lemma \(\partial C/\partial w_j=x_j^*\).</div>
+<p>From Oct 2: duality fits observational data (e.g., KFMA farm records); the professor distrusts estimated profit functions (little price variation, correlated prices), while cost functions sometimes work.</p>
+<h3>Other special topics</h3>
+<ul class="pts"><li><b>Estimation in R</b>: <code>lme4</code>/<code>nlme</code> (mixed models), <code>nls</code> (plateaus), <code>rstan</code> (Bayesian).</li><li><b>Copulas</b> (Chapter 8), <b>credit risk</b>, <b>machine learning</b> (prediction vs parameters, Oct 12).</li><li><b>Prelim-style questions</b>: combine a DGP, an optimization problem and a decision rule for a new situation; practice with the Exam prep checklist.</li></ul>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Spatial" data-by="GeoDa Software (Luc Anselin)" href="https://www.youtube.com/watch?v=WnMgdwpNSeo">Spatial Autocorrelation</a>
+<a class="vid" data-tag="Frontier" data-by="Sholih Nugroho Hadi" href="https://www.youtube.com/watch?v=qGVeb0PlBVk">Introduction to Stochastic Frontier Analysis (SFA)</a>
+<a class="vid" data-tag="Duality" data-by="Shah Academy" href="https://www.youtube.com/watch?v=WAqVZ2nxnis">Envelope Theorem, Hotelling's Lemma, Factor Demand and Output Supply</a>
+<a class="vid" data-tag="Duality" data-by="KJ Lectures" href="https://www.youtube.com/watch?v=zw4iOMJUeag">Hotelling Lemma and Firm's Supply Function</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="1"><div class="stem">In a stochastic frontier, \(u_i\ge0\) represents:</div><ol><li>Measurement noise</li><li>Technical inefficiency</li><li>The spatial lag</li><li>The price of output</li></ol><div class="why">\(v_i\) is noise; \(u_i\) pushes output below the frontier.</div></div>
+<div class="q" data-a="0"><div class="stem">Hotelling's lemma: \(\partial\pi/\partial p\) equals</div><ol><li>Output supply</li><li>Input demand</li><li>Marginal cost</li><li>Zero</li></ol><div class="why">And \(\partial\pi/\partial w_j=-x_j^*\).</div></div>
+<div class="q" data-a="2"><div class="stem">What does the matrix W describe in a spatial model?</div><ol><li>Weights in Gaussian quadrature</li><li>Wealth</li><li>Which observations are neighbors</li><li>Within-year variance</li></ol><div class="why">The spatial weights matrix.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Spatial error model</div><div class="b">\(\mathbf y=\mathbf X\boldsymbol\beta+\mathbf u\), \(\mathbf u=\lambda\mathbf W\mathbf u+\boldsymbol\varepsilon\)</div></div>
+<div class="fc"><div class="f">Stochastic frontier</div><div class="b">\(\ln y=f(\mathbf x)+v-u\), \(u\ge0\); TE = \(e^{-u}\)</div></div>
+<div class="fc"><div class="f">Hotelling's lemma</div><div class="b">\(\partial\pi/\partial p=y^*\), \(\partial\pi/\partial w_j=-x_j^*\)</div></div>
+<div class="fc"><div class="f">Shephard's lemma</div><div class="b">\(\partial C/\partial w_j=x_j^*\)</div></div>
+</section>
+</template>
+
+<template data-review="10">
+<div class="ol"><div class="oq">Why do field data need spatial models?</div><div class="oa">Nearby plots are correlated; ignoring it understates standard errors.</div></div>
+<div class="ol"><div class="oq">Spatial lag vs spatial error model?</div><div class="oa">Lag: ρWy on the right side. Error: the error follows λWu + ε.</div></div>
+<div class="ol"><div class="oq">Test for spatial autocorrelation?</div><div class="oa">Moran's I.</div></div>
+<div class="ol"><div class="oq">Stochastic frontier error structure?</div><div class="oa">\(v-u\): symmetric noise minus one-sided inefficiency.</div></div>
+<div class="ol"><div class="oq">Technical efficiency formula?</div><div class="oa">\(TE=e^{-u}\).</div></div>
+<div class="ol"><div class="oq">Why is testing \(\sigma_u^2=0\) special?</div><div class="oa">It is a boundary test.</div></div>
+<div class="ol"><div class="oq">Hotelling's lemma?</div><div class="oa">\(\partial\pi/\partial p=y^*\); \(\partial\pi/\partial w=-x^*\).</div></div>
+<div class="ol"><div class="oq">Shephard's lemma?</div><div class="oa">\(\partial C/\partial w_j=x_j^*\).</div></div>
+<div class="ol"><div class="oq">Why does the professor distrust estimated profit functions?</div><div class="oa">Little price variation and highly correlated prices.</div></div>
+<div class="ol"><div class="oq">R packages for mixed, nonlinear and Bayesian models?</div><div class="oa">lme4/nlme, nls, rstan.</div></div>
+</template>

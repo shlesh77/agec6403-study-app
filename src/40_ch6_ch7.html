@@ -1,0 +1,325 @@
+
+<!-- ===================== CHAPTER 6 ===================== -->
+<template data-chapter="6" data-part="II. Decision making under risk" data-title="Risk, utility and certainty equivalents" data-dates="Oct 2 · Oct 5 · Oct 7 · Oct 14 · Oct 19 · Oct 21 · Oct 30 · Assignment 7" data-color="6"></template>
+
+<template data-lesson="c6l1" data-ch="6" data-title="Expected utility, certainty equivalent and risk premium" data-src="Oct 2 lecture · IMG_2657–2659 · Oct 14 TA worksheet · Oct 30 review" data-yt="expected utility certainty equivalent risk premium graph">
+<section data-s="learn">
+<h3>What is risk?</h3>
+<p>The class uses a broad definition. Books separate <b>uncertainty</b> (probabilities unknown) from <b>risk</b> (probabilities known or subjectively assessable); the professor never found it useful: "it's not gonna be on your test." Risk can be described as <b>variability</b> (an SD in a normal world) or as a <b>chance of loss</b>, which leads to <b>safety-first</b> models (e.g., no more than a 5% chance of bankruptcy as a probability constraint).</p>
+
+<h3>Utility</h3>
+<div class="formula"><span class="lbl">von Neumann–Morgenstern assumptions</span>
+\[u'(\pi)&gt;0\ \ (\text{more preferred to less}),\qquad u''(\pi)&lt;0\ \ (\text{concave: risk averse}).\]
+\(u''=0\) risk neutral; \(u''&gt;0\) risk seeking.</div>
+<p>In micro theory utility depends on goods; substituting the budget constraint gives utility of wealth, so wealth, consumption or profit can be used. Expected-utility axioms: completeness, transitivity, continuity, independence (a preference axiom, not statistical independence). Positive affine transformations \(a+bU\), \(b&gt;0\), preserve rankings, so a negative utility number means nothing by itself.</p>
+
+<h3>Expected utility</h3>
+<div class="formula"><span class="lbl">Discrete and continuous ("right from math stat")</span>
+\[E\,u(w)=\sum_{i=1}^{n}u(w_i)\,p_i,\qquad E\,u(w)=\int_{-\infty}^{\infty}u(w)f(w)\,dw.\]
+The probabilities go <b>outside each utility evaluation</b>.</div>
+<div class="warn"><span class="lbl">The biggest mistake</span>\(u(\bar\pi)\ne E\,u(\pi)\) unless utility is linear, "because the expectation doesn't go through on a nonlinear function." "When I was at Purdue, a girl failed her prelims because she didn't know this ... that is a very big deal." For concave \(u\), Jensen: \(E\,u(\pi)\le u(E\pi)\).</div>
+
+<h3>Certainty equivalent and risk premium</h3>
+<div class="formula"><span class="lbl">Definitions</span>
+\[u(CE)=E\,u(W),\qquad CE=u^{-1}\big(E\,u(W)\big),\qquad RP=E(W)-CE.\]
+CE is a <b>money amount</b>, not utility. Risk averse: \(CE&lt;E(W)\), \(RP&gt;0\).</div>
+<div class="exam"><span class="lbl">Exam alert (Oct 2)</span>"There's a pretty good chance that this graph will be on your exam." Draw a concave \(u\); mark \(\pi_1,\pi_2\) and the chord between them. At \(\bar\pi\) the curve gives \(u(\bar\pi)\) and the chord gives \(E\,u(\pi)\). Go horizontally from \(E\,u\) to the curve and drop down: that is CE. The horizontal gap from CE to \(\bar\pi\) is the risk premium. The chord point is at the probability-weighted mean (the midpoint only when \(p=1/2\)).</div>
+<div data-tool="ce"></div>
+<div class="tip"><b>Unfamiliar utility on the exam (Oct 30)?</b> Start from \(U(CE)=E[U(W)]\), substitute the given function, and solve for CE. Memorizing only the exponential formula is not enough.</div>
+<div class="prof"><span class="lbl">In class</span>Direct elicitation of utility functions was popular when he was a graduate student but is rare now: large measurement errors, and elicited risk preferences explain little in regressions. Surveys ask about five related questions and average them. In class (Oct 12) students placed themselves from risk seeking to highly risk averse on an elicitation worksheet.</div>
+
+<h3>Writing a risky choice (Oct 14 TA worksheet)</h3>
+<div class="formula"><span class="lbl">Discrete expected-utility choice</span>\[a^*\in\arg\max_{a\in A}\sum_i p_i\,U\big(\pi_i(a)\big).\]
+Binary decision: \(a\in\{0,1\}\). Continuous: state the feasible interval. Define revenue and cost before inserting profit into utility.</div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Wealth 16 or 64 with equal probability, \(U=\sqrt w\). Find E(W), EU, U(EW), CE, RP.</summary><div class="body"><p>\(E(W)=40\); \(EU=(4+8)/2=6\); \(U(40)=6.325\); \(CE=6^2=\)<span class="ans">36</span>; \(RP=40-36=\)<span class="ans">4</span>.</p></div></details>
+<details class="sol"><summary>Log utility, wealth 50 or 150 with p = 0.5. Find CE.</summary><div class="body"><p>\(EU=0.5\ln50+0.5\ln150\); \(CE=\exp(EU)=\sqrt{50\times150}=\)<span class="ans">86.6</span>; RP = 100 − 86.6 = 13.4.</p></div></details>
+<details class="sol"><summary>Assignment 7: write the discrete-choice expected-utility problem for three cotton varieties.</summary><div class="body"><p>\(\max_{j\in\{A1,A2,A3\}}\ \sum_{s=1}^{4}p_s\,U(\pi_{js})\), where \(s\) = weather state (excellent, good, fair, poor) with \(p_s=0.10,0.30,0.35,0.25\), \(\pi_{js}\) income of variety \(j\) in state \(s\) (in $1,000), and \(U\) the elicited utility function.</p></div></details>
+<details class="sol"><summary>Assignment 7: revenue-insurance coverage choice. Write it and say what an actuarially fair premium implies.</summary><div class="body"><p>\(\max_{c\in C}\ E\,U\big(\tilde p\tilde Y-K+I(c)-\text{prem}(c)\big)\), \(I(c)=\max\{0,\ c\,\bar R-\tilde p\tilde Y\}\), with \(C\) the offered coverage levels, \(\bar R\) guaranteed revenue base, \(\tilde p,\tilde Y\) random harvest price and yield, \(K\) costs. With a fair premium (\(\text{prem}=E\,I\)) a risk-averse producer picks the <b>highest</b> coverage offered: it lowers variance without lowering the mean. Producers who decline high subsidized coverage are revealing low risk aversion (or other costs/factors).</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Start here" data-by="Prof John K" href="https://www.youtube.com/watch?v=eFAo0uAUVtE">Certainty Equivalent and Risk Premium Explained (With Worked Example)</a>
+<a class="vid" data-tag="Theory" data-by="Justin Eloriaga" href="https://www.youtube.com/watch?v=54D-w9SMenU">Expected Utility Theorem and Certainty Equivalent</a>
+<a class="vid" data-tag="Calculation" data-by="Prof John K" href="https://www.youtube.com/watch?v=tQyw1P0x66Y">Certainty Equivalent and Risk Premium Calculation</a>
+<a class="vid" data-tag="Basics" data-by="BurkeyAcademy" href="https://www.youtube.com/watch?v=Hr0K6K16PQs">Risk Aversion and Expected Utility Basics</a>
+<a class="vid" data-tag="Jensen" data-by="In Case of Econ Struggles" href="https://www.youtube.com/watch?v=fJzrPkZzytw">Intuition Behind Jensen's Inequality in 3 Minutes</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="2"><div class="stem">For a risk-averse decision maker:</div><ol><li>\(u(\bar\pi)=E\,u(\pi)\)</li><li>\(u(\bar\pi)&lt;E\,u(\pi)\)</li><li>\(u(\bar\pi)&gt;E\,u(\pi)\)</li><li>CE &gt; E(π)</li></ol><div class="why">The concave curve lies above its chord.</div></div>
+<div class="q" data-a="0"><div class="stem">The certainty equivalent is measured in:</div><ol><li>Dollars (the outcome's units)</li><li>Utils</li><li>Probability</li><li>Percent</li></ol><div class="why">CE is the sure money amount with the same utility as the gamble.</div></div>
+<div class="q" data-a="3"><div class="stem">Risk premium equals:</div><ol><li>CE − E(W)</li><li>E u(W) − u(EW)</li><li>Var(W)</li><li>E(W) − CE</li></ol><div class="why">Positive for a risk-averse person.</div></div>
+<div class="q" data-a="1"><div class="stem">Which gives the correct expected utility for outcomes 10 and 30 with equal probability?</div><ol><li>\(U(20)\)</li><li>\(0.5U(10)+0.5U(30)\)</li><li>\(U(0.5\cdot10+0.5\cdot30)\)</li><li>\(0.5U(40)\)</li></ol><div class="why">Average the utilities, not the money.</div></div>
+<div class="q" data-a="2"><div class="stem">Which property of utility is NOT required for vNM expected utility in this class?</div><ol><li>\(u'&gt;0\)</li><li>Numbers (cardinal scale for expectations)</li><li>A specific functional form such as CARA</li><li>Transitivity</li></ol><div class="why">Specific forms are an extra assumption (used by SERF).</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Expected utility (discrete)</div><div class="b">\(\sum_i p_iU(w_i)\)</div></div>
+<div class="fc"><div class="f">CE definition</div><div class="b">\(U(CE)=E[U(W)]\)</div></div>
+<div class="fc"><div class="f">Risk premium</div><div class="b">\(E(W)-CE\)</div></div>
+<div class="fc"><div class="f">Why u(E π) ≠ E u(π)</div><div class="b">Expectation does not pass through a nonlinear function (Jensen).</div></div>
+<div class="fc"><div class="f">Safety-first</div><div class="b">Risk as chance of loss, e.g., a constraint P(bankruptcy) ≤ 5%</div></div>
+</section>
+</template>
+
+<template data-lesson="c6l2" data-ch="6" data-title="Arrow–Pratt risk aversion, CARA and CRRA" data-src="Oct 5 · Oct 19 · Oct 21 lectures · IMG_2659–2660, IMG_2801–2804" data-yt="Arrow Pratt absolute risk aversion CARA CRRA">
+<section data-s="learn">
+<h3>Measuring risk aversion</h3>
+<div class="formula"><span class="lbl">Arrow–Pratt coefficients</span>
+\[A(w)=r(w)=-\frac{u''(w)}{u'(w)}\ \ (\text{absolute}),\qquad R(w)=w\,A(w)\ \ (\text{relative}).\]
+\(r&gt;0\) risk averse. CARA: \(A'(w)=0\); DARA: \(A'(w)&lt;0\); IARA: \(A'(w)&gt;0\).</div>
+<div class="warn"><span class="lbl">Units matter</span>\(r(w)\) depends on the units of measurement (dollars vs $1,000; per month vs per year) and often looks tiny (0.0001). In Assignment 9, \(r=0.05\) is per $1,000. State units and justify the range.</div>
+
+<h3>Negative exponential (CARA)</h3>
+<div class="formula"><span class="lbl">Derivation</span>
+\[u(w)=1-e^{-\rho w}\ \ (\text{or }-e^{-\rho w}),\quad u'=\rho e^{-\rho w},\quad u''=-\rho^2e^{-\rho w},\quad r(w)=\rho.\]</div>
+<div class="prof"><span class="lbl">Trick question (Oct 5)</span>He first wrote \(e^{-\rho w}\): its first derivative is negative, so it violates "more is better." You need the minus sign or \(1-e^{-\rho w}\).</div>
+<div class="formula"><span class="lbl">CARA certainty equivalent (Oct 21)</span>
+\[-e^{-rCE}=E[-e^{-rW}]\ \Rightarrow\ CE=-\frac1r\ln E\big[e^{-rW}\big]=-\frac1r\ln\sum_jp_je^{-rw_j}.\]
+At \(r=0\) use the limit \(CE=E(W)\); never divide by zero. If \(W\sim N(\mu,\sigma^2)\): \(CE=\mu-\tfrac{r}{2}\sigma^2\) exactly.</div>
+
+<h3>Power (CRRA) and log utility</h3>
+<div class="formula"><span class="lbl">Normalized power utility</span>
+\[u(w)=\frac{w^{1-\rho}}{1-\rho},\quad u'=w^{-\rho},\quad u''=-\rho w^{-\rho-1},\quad A=\frac{\rho}{w},\quad R=\rho,\quad w&gt;0.\]
+At \(\rho=1\): \(u=\ln w\), \(A=1/w\), \(R=1\) (DARA). CE for log: \(\exp(E\ln W)\). For \(u=w^a/a\): \(CE=(a\,EU)^{1/a}\).</div>
+<div class="clarify"><span class="lbl">Clarifying</span>The notebook sometimes drops the \(1-\rho\) denominator; then check the sign of \(u'\) carefully. For a small zero-mean risk, \(RP\approx\tfrac12A(w)\sigma^2\). CARA is convenient because the ranking does not depend on starting wealth.</div>
+<div class="prof"><span class="lbl">Behavior and reality (Oct 5)</span>Without risk seeking, theories struggle to explain casinos and lottery tickets (a 93% payout slot machine loses 7 cents per dollar); gambling can be a consumption good. Behavioral economics shows individuals violate the axioms (overweighting small probabilities), but in aggregate expected utility works well. "All models are wrong. But some are useful." Risk should really be judged for the whole farm, though people keep mental "pockets of money."</div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Show that \(u=1-e^{-\rho w}\) has constant absolute risk aversion.</summary><div class="body"><p>\(-u''/u'=\rho^2e^{-\rho w}/(\rho e^{-\rho w})=\)<span class="ans">ρ</span>, independent of \(w\).</p></div></details>
+<details class="sol"><summary>Find A(w) and R(w) for \(u=\ln w\).</summary><div class="body"><p>\(u'=1/w\), \(u''=-1/w^2\): \(A=1/w\) (decreasing: DARA), \(R=1\).</p></div></details>
+<details class="sol"><summary>CARA with r = 0.05 per $1,000, income 30 or 70 ($1,000) with equal probability. CE?</summary><div class="body"><p>\(CE=-\frac{1}{0.05}\ln\big(0.5e^{-1.5}+0.5e^{-3.5}\big)=-20\ln(0.1116+0.0151)=-20\ln(0.1267)=\)<span class="ans">41.3</span> ($41,300) vs mean 50.</p></div></details>
+<details class="sol"><summary>Unfamiliar utility \(U=w^{1/3}\): outcomes 8 and 64, p = 0.5. CE?</summary><div class="body"><p>\(EU=(2+4)/2=3\); \(CE^{1/3}=3\Rightarrow CE=\)<span class="ans">27</span>; mean 36, RP 9.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Solved problem" data-by="ECON MATHS" href="https://www.youtube.com/watch?v=CZPFznJbhgs">Arrow–Pratt Measure of Absolute Risk Aversion</a>
+<a class="vid" data-tag="How to measure" data-by="Economics in Many Lessons" href="https://www.youtube.com/watch?v=Z6nI505WMqg">Arrow–Pratt Risk Aversion: How to Measure</a>
+<a class="vid" data-tag="Lecture" data-by="ProfArvan" href="https://www.youtube.com/watch?v=w6VVILttGbs">Expected Utility Hypothesis</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="1"><div class="stem">Arrow–Pratt absolute risk aversion is:</div><ol><li>\(u''/u'\)</li><li>\(-u''/u'\)</li><li>\(-w\,u'/u''\)</li><li>\(u'/u\)</li></ol><div class="why">Negative ratio of second to first derivative.</div></div>
+<div class="q" data-a="0"><div class="stem">For \(u=1-e^{-\rho w}\), \(r(w)=\)</div><ol><li>ρ</li><li>ρ/w</li><li>1/w</li><li>ρ²</li></ol><div class="why">CARA.</div></div>
+<div class="q" data-a="3"><div class="stem">Is \(u=e^{-\rho w}\) a valid increasing utility?</div><ol><li>Yes, it is CARA</li><li>Yes, it is CRRA</li><li>Only for negative w</li><li>No, its first derivative is negative</li></ol><div class="why">The Oct 5 trick question.</div></div>
+<div class="q" data-a="2"><div class="stem">With CARA utility and normal W, CE =</div><ol><li>μ</li><li>μ − rσ</li><li>μ − rσ²/2</li><li>μ + rσ²/2</li></ol><div class="why">Exact under both assumptions.</div></div>
+<div class="q" data-a="1"><div class="stem">Log utility has relative risk aversion equal to:</div><ol><li>0</li><li>1</li><li>w</li><li>1/w</li></ol><div class="why">\(R=w\cdot(1/w)=1\).</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">Absolute and relative risk aversion</div><div class="b">\(A=-u''/u'\); \(R=wA\)</div></div>
+<div class="fc"><div class="f">CARA utility and its A(w)</div><div class="b">\(1-e^{-rw}\) (or \(-e^{-rw}\)); \(A=r\)</div></div>
+<div class="fc"><div class="f">CRRA utility</div><div class="b">\(w^{1-\rho}/(1-\rho)\); \(A=\rho/w\), \(R=\rho\)</div></div>
+<div class="fc"><div class="f">CARA CE formula</div><div class="b">\(-\frac1r\ln\sum_jp_je^{-rw_j}\); normal case \(\mu-r\sigma^2/2\)</div></div>
+<div class="fc"><div class="f">Small-risk risk premium</div><div class="b">\(RP\approx\tfrac12A(w)\sigma^2\)</div></div>
+</section>
+</template>
+
+<template data-review="6">
+<div class="ol"><div class="oq">Two ways to describe risk in class?</div><div class="oa">Variability (SD) or chance of loss (safety-first).</div></div>
+<div class="ol"><div class="oq">Will the risk-vs-uncertainty distinction be tested?</div><div class="oa">No.</div></div>
+<div class="ol"><div class="oq">What do \(u'&gt;0\) and \(u''&lt;0\) mean?</div><div class="oa">More is preferred; diminishing marginal utility (risk aversion).</div></div>
+<div class="ol"><div class="oq">Sign of \(u''\) for risk neutral and risk seeking?</div><div class="oa">Zero; positive.</div></div>
+<div class="ol"><div class="oq">Write discrete expected utility.</div><div class="oa">\(\sum_i p_iu(w_i)\).</div></div>
+<div class="ol"><div class="oq">Write continuous expected utility.</div><div class="oa">\(\int u(w)f(w)\,dw\).</div></div>
+<div class="ol"><div class="oq">Is \(u(\bar\pi)=E\,u(\pi)\)?</div><div class="oa">Only for linear utility.</div></div>
+<div class="ol"><div class="oq">Which inequality relates them for concave utility?</div><div class="oa">Jensen: \(E\,u(\pi)\le u(E\pi)\).</div></div>
+<div class="ol"><div class="oq">Define the certainty equivalent.</div><div class="oa">The sure amount with \(u(CE)=E\,u(W)\).</div></div>
+<div class="ol"><div class="oq">Define the risk premium.</div><div class="oa">\(E(W)-CE\).</div></div>
+<div class="ol"><div class="oq">On the CE graph, where is E u(π)?</div><div class="oa">On the chord, above the probability-weighted mean.</div></div>
+<div class="ol"><div class="oq">How do you locate CE on the graph?</div><div class="oa">Go horizontally from E u to the curve and drop down to the wealth axis.</div></div>
+<div class="ol"><div class="oq">16 or 64 equally likely with √w: CE and RP?</div><div class="oa">CE 36, RP 4.</div></div>
+<div class="ol"><div class="oq">Do positive affine transformations change rankings?</div><div class="oa">No.</div></div>
+<div class="ol"><div class="oq">How do you find CE for an unfamiliar utility?</div><div class="oa">Set \(U(CE)=E[U(W)]\) and solve.</div></div>
+<div class="ol"><div class="oq">Why is direct utility elicitation rare now?</div><div class="oa">Large measurement error; little explanatory power.</div></div>
+<div class="ol"><div class="oq">Arrow–Pratt absolute risk aversion formula?</div><div class="oa">\(-u''/u'\).</div></div>
+<div class="ol"><div class="oq">Relative risk aversion?</div><div class="oa">\(R=wA(w)\).</div></div>
+<div class="ol"><div class="oq">CARA function and its A?</div><div class="oa">\(1-e^{-rw}\); \(A=r\).</div></div>
+<div class="ol"><div class="oq">What was wrong with \(e^{-\rho w}\)?</div><div class="oa">Decreasing: \(u'&lt;0\).</div></div>
+<div class="ol"><div class="oq">CARA CE formula?</div><div class="oa">\(-\tfrac1r\ln\sum p_je^{-rw_j}\).</div></div>
+<div class="ol"><div class="oq">CE at r = 0?</div><div class="oa">The mean (as a limit).</div></div>
+<div class="ol"><div class="oq">CE with CARA and normal wealth?</div><div class="oa">\(\mu-r\sigma^2/2\).</div></div>
+<div class="ol"><div class="oq">CRRA utility, A and R?</div><div class="oa">\(w^{1-\rho}/(1-\rho)\); \(A=\rho/w\); \(R=\rho\).</div></div>
+<div class="ol"><div class="oq">A and R for log utility?</div><div class="oa">\(1/w\) and 1.</div></div>
+<div class="ol"><div class="oq">What does DARA mean?</div><div class="oa">Absolute risk aversion decreases with wealth.</div></div>
+<div class="ol"><div class="oq">Why state units with r?</div><div class="oa">r depends on the money units (dollars vs $1,000).</div></div>
+<div class="ol"><div class="oq">Small-risk approximation to RP?</div><div class="oa">\(\tfrac12A(w)\sigma^2\).</div></div>
+<div class="ol"><div class="oq">With an actuarially fair premium, what coverage does a risk-averse farmer choose?</div><div class="oa">The highest coverage offered.</div></div>
+<div class="ol"><div class="oq">Why might casinos exist despite risk aversion?</div><div class="oa">Risk seeking in some ranges, or gambling as a consumption good.</div></div>
+</template>
+
+<!-- ===================== CHAPTER 7 ===================== -->
+<template data-chapter="7" data-part="II. Decision making under risk" data-title="Efficiency criteria and stochastic dominance" data-dates="Oct 5 · Oct 7 · Oct 9 notes · Oct 19 · Oct 30 · Assignments 7 and 9" data-color="7"></template>
+
+<template data-lesson="c7l1" data-ch="7" data-title="Mean–variance efficiency" data-src="Oct 5 lecture · IMG_2660–2662 · Assignment 7 Q2" data-yt="mean variance efficiency dominance decision under risk">
+<section data-s="learn">
+<h3>Why efficiency criteria?</h3>
+<p>We rarely know ρ even for one person, and we want conclusions for a group with different risk aversion. Efficiency criteria split alternatives into an <b>efficient set</b> (not dominated) and an <b>inefficient set</b>.</p>
+<div class="formula"><span class="lbl">E-V dominance</span>
+F dominates G if \(E_F\ge E_G\) and \(V_F\le V_G\), with at least one strict inequality.
+<br>Assumptions: risk aversion, plus normal outcomes <b>or</b> quadratic utility.</div>
+<div class="exam"><span class="lbl">Test item (IMG_2661 "Test*")</span>Draw CDFs: a lower mean for G puts more of G's CDF to the left; a higher variance makes G's CDF flatter. "This is something that you're gonna have to know ... that's gonna be on the test."</div>
+
+<h3>The A/B/C example (Oct 5 notebook, five outcomes, p = 0.2 each)</h3>
+<div class="scrollx"><table class="t"><thead><tr><th>Outcome</th><th>A</th><th>B</th><th>C</th></tr></thead><tbody>
+<tr><td>1</td><td>−4,000</td><td>−5,000</td><td>−5,000</td></tr><tr><td>2</td><td>−4,000</td><td>5,000</td><td>5,000</td></tr><tr><td>3</td><td>−4,000</td><td>15,000</td><td>5,000</td></tr><tr><td>4</td><td>25,000</td><td>25,000</td><td>5,000</td></tr><tr><td>5</td><td>25,000</td><td>35,000</td><td>36,000</td></tr>
+<tr><td>Mean</td><td>7,600</td><td>15,000</td><td>9,200</td></tr><tr><td>SD</td><td>14,207</td><td>14,142</td><td>13,948</td></tr></tbody></table></div>
+<ul class="pts"><li>B has the highest mean; C the lowest SD: both efficient. A has a lower mean and higher SD than both: inefficient. <b>E-V efficient set {B, C}.</b></li>
+<li>A safety-first person looking only at the worst outcome picks A (−4,000); the extreme risk seeker looks only at the best (C). Neither is the E-V criterion.</li>
+<li>Standard abbreviations (E, SD, var) need not be defined in a paper.</li></ul>
+
+<h3>Weaknesses of E-V</h3>
+<ol class="pts"><li>The efficient set can be large: domination must be by a single alternative, not a convex combination.</li>
+<li>If outcomes are not normal, the E-V efficient set can differ from the SSD set.</li>
+<li>If F has a higher mean <i>and</i> higher variance than G, both are E-V efficient even when F pays more in every state and nobody would pick G.</li></ol>
+<div class="clarify"><span class="lbl">Clarifying: check it in the lab</span>Load "A, B, C" in the risk-ranking lab: SSD says B dominates C even though E-V keeps C (C's lower SD comes from a long right tail at 36,000 and a lump at 5,000). That is weakness 2 in action.</div>
+<div data-tool="rank" data-preset="abc"></div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Assignment 7/9 cotton: means 52.910, 53.575, 52.590; variances 462.977, 284.740, 61.577 ($1,000). Expected-profit choice and E-V efficient set?</summary><div class="body"><p>Expected profit: <span class="ans">A2</span> (highest mean). A2 dominates A1 (higher mean, lower variance). A2 vs A3: A2 higher mean, A3 lower variance → both efficient. <span class="ans">E-V efficient set {A2, A3}</span>.</p></div></details>
+<details class="sol"><summary>How do you compute an E-V efficient set in a spreadsheet?</summary><div class="body"><p>For each alternative compute \(\sum p_ix_i\) and \(\sum p_i(x_i-\bar x)^2\); remove any alternative beaten on both. The highest-mean and the lowest-variance alternatives are always efficient.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="Risk and EU" data-by="BurkeyAcademy" href="https://www.youtube.com/watch?v=Hr0K6K16PQs">Risk Aversion and Expected Utility Basics</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="0"><div class="stem">E-V dominance can be justified for a risk-averse person when outcomes are normal or utility is:</div><ol><li>Quadratic</li><li>Logarithmic</li><li>Linear</li><li>Exponential only</li></ol><div class="why">Normality or quadratic utility.</div></div>
+<div class="q" data-a="2"><div class="stem">In the A/B/C example, the E-V efficient set is:</div><ol><li>{A}</li><li>{A, B, C}</li><li>{B, C}</li><li>{B}</li></ol><div class="why">B highest mean, C lowest SD, A dominated by both.</div></div>
+<div class="q" data-a="1"><div class="stem">Which is a weakness of E-V?</div><ol><li>It requires knowing ρ exactly</li><li>An alternative with higher mean and higher variance can't dominate even if it pays more in every state</li><li>It cannot handle discrete outcomes</li><li>It always gives a single choice</li></ol><div class="why">E-V needs both inequalities.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">E-V dominance</div><div class="b">\(E_F\ge E_G\), \(V_F\le V_G\), one strict</div></div>
+<div class="fc"><div class="f">E-V assumptions</div><div class="b">Risk aversion + normality or quadratic utility</div></div>
+<div class="fc"><div class="f">Always E-V efficient</div><div class="b">The highest-mean and the lowest-variance alternatives</div></div>
+<div class="fc"><div class="f">Cotton E-V efficient set</div><div class="b">{A2, A3}; A2 dominates A1</div></div>
+</section>
+</template>
+
+<template data-lesson="c7l2" data-ch="7" data-title="First- and second-degree stochastic dominance" data-src="Oct 5 · Oct 7 lectures · IMG_2663 · Oct 10 binder worksheet IMG_2697" data-yt="first order second order stochastic dominance CDF">
+<section data-s="learn">
+<h3>FSD</h3>
+<div class="formula"><span class="lbl">First-degree stochastic dominance</span>Assumption: \(u'(\pi)&gt;0\) only.
+\[F\ \text{dominates}\ G\ \text{by FSD if}\ F(\pi)\le G(\pi)\ \text{for all }\pi\ (\text{strict somewhere}).\]
+F's CDF lies at or to the right of G's: the CDFs do not cross.</div>
+<ul class="pts"><li>If FSD holds, "that is something very strong": everyone who prefers more to less prefers F.</li><li>Test: subtract the CDFs at many points or plot them; in practice people plot.</li><li>Advantage: very weak preference assumption. Disadvantage: not discriminating; the efficient set can be large. In the A/B/C example, B and C cannot be ranked by FSD because their CDFs cross.</li></ul>
+
+<h3>SSD</h3>
+<div class="formula"><span class="lbl">Second-degree stochastic dominance</span>Assumptions: \(u'&gt;0\) and \(u''&lt;0\).
+\[\int_{-\infty}^{\pi}F(t)\,dt\le\int_{-\infty}^{\pi}G(t)\,dt\quad\text{for all }\pi\ (\text{strict somewhere}).\]</div>
+<ul class="pts"><li>The CDFs may cross, but the <b>integrated</b> CDFs (areas from the left) do not.</li><li>F must have the higher (or equal) mean; G's lowest outcome comes first (G starts to the left); more of G is to the left of F than to the right.</li><li>Check cumulative areas at every breakpoint from the left, not just the total area.</li><li>Weaknesses: risk aversion does not always hold; the efficient set can still be large.</li><li><b>Third-degree</b> dominance adds an assumption on \(u'''\) (skewness preference). People think they like positive skewness, but safety-first concerns can make them prefer negative skewness; near-certain bankruptcy can make a decision maker risk seeking (the trader story).</li></ul>
+<div class="formula"><span class="lbl">Relationships (binder worksheet)</span>FSD ⇒ SSD (so "FSD but not SSD" is <b>impossible</b>). Not-FSD does not imply not-SSD. FSD does not imply lower variance (so "A FSD B but not E-V" is possible). SSD does not imply E-V dominance when means differ.</div>
+<div class="prof"><span class="lbl">Writing note (Oct 7)</span>"Second-Degree Stochastic Dominance" in title case: "second" is a word, not a prefix (compare "Pre-multiply"), so both parts are capitalized. The hyphen is needed because "second" modifies "degree" and together they modify "dominance."</div>
+<div data-tool="rank" data-preset="cotton"></div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Draw CDFs where A dominates B by FSD but not by E-V.</summary><div class="body"><p>A: 10 or 100 with p = 0.5. B: 9 or 11 with p = 0.5. A's CDF is everywhere at or below B's (FSD), but A's variance is far larger, so A does not E-V dominate B.</p></div></details>
+<details class="sol"><summary>Can A dominate B by FSD but not SSD?</summary><div class="body"><p><span class="ans">Impossible.</span> FSD implies SSD: if \(F\le G\) everywhere then the integrals are also ordered.</p></div></details>
+<details class="sol"><summary>A/B/C: does B dominate C by SSD?</summary><div class="body"><p>Both CDFs equal 0.2 on [−5k, 5k). From 5k to 25k, C's CDF (0.8) is above B's (0.4, 0.6), building an area gap of 0.4·10,000 + 0.2·10,000 = 6,000 in B's favor. From 35k to 36k B's CDF is higher by 0.2, giving back only 200. Integrated CDF of B is never above C's → <span class="ans">B SSD-dominates C</span>, though E-V keeps C.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="FSD" data-by="(10-4) Math" href="https://www.youtube.com/watch?v=xGEIoicxmWo">Intro to FOSD Made Easy</a>
+<a class="vid" data-tag="SSD" data-by="(10-4) Math" href="https://www.youtube.com/watch?v=q0fOJ9vC3iQ">Clearest Explanation of Second-Order Stochastic Dominance</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="1"><div class="stem">F dominates G by FSD if:</div><ol><li>\(F(\pi)\ge G(\pi)\) for all π</li><li>\(F(\pi)\le G(\pi)\) for all π, strict somewhere</li><li>\(E_F&gt;E_G\)</li><li>\(V_F&lt;V_G\)</li></ol><div class="why">F's CDF is lower: less probability of low outcomes.</div></div>
+<div class="q" data-a="3"><div class="stem">SSD requires which assumptions?</div><ol><li>\(u'&gt;0\) only</li><li>Normality</li><li>CARA utility</li><li>\(u'&gt;0\) and \(u''&lt;0\)</li></ol><div class="why">More is better and risk aversion.</div></div>
+<div class="q" data-a="0"><div class="stem">"A dominates B by FSD but not by SSD" is:</div><ol><li>Impossible</li><li>Common</li><li>Possible only with normal outcomes</li><li>Possible only with risk seekers</li></ol><div class="why">FSD ⇒ SSD.</div></div>
+<div class="q" data-a="2"><div class="stem">Under SSD, CDFs …</div><ol><li>Can never cross</li><li>Must be identical</li><li>May cross, but integrated CDFs do not</li><li>Must have equal variances</li></ol><div class="why">That is the difference from FSD.</div></div>
+<div class="q" data-a="1"><div class="stem">Which is true for SSD dominance of F over G with finite means?</div><ol><li>F has the lower mean</li><li>F has the higher (or equal) mean</li><li>F has lower variance</li><li>F is normal</li></ol><div class="why">Even a risk-neutral person must not prefer G.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">FSD condition</div><div class="b">\(F(\pi)\le G(\pi)\ \forall\pi\): CDFs do not cross</div></div>
+<div class="fc"><div class="f">SSD condition</div><div class="b">\(\int^{\pi}F\le\int^{\pi}G\ \forall\pi\): integrated CDFs do not cross</div></div>
+<div class="fc"><div class="f">FSD vs SSD assumptions</div><div class="b">FSD: u′ &gt; 0. SSD: u′ &gt; 0 and u″ &lt; 0.</div></div>
+<div class="fc"><div class="f">FSD but not SSD?</div><div class="b">Impossible: FSD ⇒ SSD</div></div>
+<div class="fc"><div class="f">Third-degree SD</div><div class="b">Adds an assumption on u‴ (skewness preference)</div></div>
+</section>
+</template>
+
+<template data-lesson="c7l3" data-ch="7" data-title="SDRF, SERF and convex-set dominance" data-src="Oct 9 binder notes IMG_2696 · Oct 19 · Oct 30 review · Assignment 9" data-yt="stochastic efficiency with respect to a function SERF certainty equivalent">
+<section data-s="learn">
+<h3>SDRF (stochastic dominance with respect to a function)</h3>
+<p>Due to Jack Meyer (the professor's risk teacher). Computes efficient sets for a <b>range</b> of Arrow–Pratt absolute risk aversion.</p>
+<div class="formula"><span class="lbl">Assumptions and rule</span>(1) \(u'(x)&gt;0\); (2) \(r_L(x)\le-u''(x)/u'(x)\le r_U(x)\) for all \(x\).
+\[F\ \text{dominates}\ G\ \text{if}\ \min_{r(x)\in[r_L,r_U]}\int\big[G(x)-F(x)\big]u'(x)\,dx&gt;0.\]
+FSD is the special case \(r_L=-\infty,\ r_U=+\infty\); SSD is \(r_L=0,\ r_U=+\infty\). Narrower bounds → more discriminating. Bounds can be negative (risk seekers).</div>
+
+<h3>SERF (stochastic efficiency with respect to a function)</h3>
+<p>Due to James Richardson (on the professor's dissertation committee). Popular because software is easier; SDRF is a programming problem (Claude can now write it).</p>
+<ol class="pts"><li>Pick a utility family (commonly negative exponential) and a risk-aversion range.</li><li>Compute the CE of every alternative at each coefficient.</li><li>Plot CE against r. At each r, the highest curve is preferred; where curves cross, the preferred action switches.</li><li>The efficient set over the range = alternatives on the upper envelope somewhere in the range.</li></ol>
+<ul class="pts"><li>A certain payoff has a horizontal CE curve. A risky payoff's CARA CE falls with r and starts at its mean at \(r=0\).</li><li>Under normality each CARA CE curve is a straight line with slope \(-\sigma^2/2\); otherwise the shape depends on the whole distribution.</li></ul>
+<div class="exam"><span class="lbl">Good test question (Oct 30)</span>SDRF vs SERF: both restrict risk aversion; <b>SDRF leaves the utility form unspecified</b> within the bounds, <b>SERF picks a utility family</b>. A preference valid for every utility in the SDRF class also holds for a SERF function in that class.</div>
+
+<h3>Convex-set stochastic dominance (Oct 19)</h3>
+<p>An alternative can be dominated by a feasible <b>mixture</b> of other alternatives even when no single one dominates it, shrinking the efficient set. Whether a mixture means random selection or a portfolio (part of the land in each) must be modeled, and feasibility and dependence matter. Discussed briefly, not computed.</p>
+<div data-tool="rank" data-preset="cotton"></div>
+</section>
+
+<section data-s="examples">
+<details class="sol"><summary>Why is SSD a special case of SDRF?</summary><div class="body"><p>SSD assumes only risk aversion: \(r\in[0,\infty)\), i.e., \(r_L=0\), \(r_U=\infty\) in SDRF.</p></div></details>
+<details class="sol"><summary>Assignment 9: which variety does SERF prefer at r = 0 and at r = 0.1 per $1,000?</summary><div class="body"><p>At \(r=0\), CE = mean, so A2 (53.575) is preferred. As r rises, the low-variance stripper A3 gains; open the lab (cotton preset, r from 0 to 0.1) to read the crossing point and the CE values.</p></div></details>
+<details class="sol"><summary>Sketch a SERF graph with one certain alternative and one risky alternative with a higher mean.</summary><div class="body"><p>The certain alternative is a horizontal line at its value. The risky one starts above it at r = 0 (its mean) and slopes down; it is preferred left of the crossing point and the certain one to the right.</p></div></details>
+</section>
+
+<section data-s="watch">
+<a class="vid" data-tag="CE foundation" data-by="Justin Eloriaga" href="https://www.youtube.com/watch?v=54D-w9SMenU">Expected Utility Theorem and Certainty Equivalent</a>
+</section>
+
+<section data-s="quiz">
+<div class="q" data-a="2"><div class="stem">The key difference between SDRF and SERF is:</div><ol><li>SDRF uses CDFs; SERF uses means</li><li>SERF needs no risk-aversion range</li><li>SERF specifies a utility functional form; SDRF does not</li><li>SDRF only works with normal outcomes</li></ol><div class="why">The professor called this a good test question.</div></div>
+<div class="q" data-a="0"><div class="stem">In SDRF, FSD corresponds to bounds:</div><ol><li>\(r_L=-\infty,\ r_U=+\infty\)</li><li>\(r_L=0,\ r_U=+\infty\)</li><li>\(r_L=r_U=0\)</li><li>\(r_L=0,\ r_U=1\)</li></ol><div class="why">No restriction on risk aversion at all.</div></div>
+<div class="q" data-a="3"><div class="stem">On a SERF graph, a certain payoff appears as:</div><ol><li>A line falling at slope −σ²/2</li><li>A vertical line</li><li>A rising curve</li><li>A horizontal line</li></ol><div class="why">Its CE equals its value for every r.</div></div>
+<div class="q" data-a="1"><div class="stem">At r = 0 each alternative's CARA CE equals:</div><ol><li>Its minimum</li><li>Its mean</li><li>Its variance</li><li>Zero</li></ol><div class="why">Risk neutrality.</div></div>
+</section>
+
+<section data-s="cards">
+<div class="fc"><div class="f">SDRF</div><div class="b">Dominance for all utilities with \(r_L\le-u''/u'\le r_U\); form unspecified (Meyer)</div></div>
+<div class="fc"><div class="f">SERF</div><div class="b">Pick a utility family; rank alternatives by CE across a range of r (Richardson)</div></div>
+<div class="fc"><div class="f">SSD inside SDRF</div><div class="b">\(r_L=0,\ r_U=\infty\)</div></div>
+<div class="fc"><div class="f">Convex-set dominance</div><div class="b">Dominated by a feasible mixture of other alternatives</div></div>
+<div class="fc"><div class="f">CARA CE line slope under normality</div><div class="b">\(-\sigma^2/2\)</div></div>
+</section>
+</template>
+
+<template data-review="7">
+<div class="ol"><div class="oq">What is an efficient set?</div><div class="oa">Alternatives not dominated under a criterion.</div></div>
+<div class="ol"><div class="oq">State E-V dominance.</div><div class="oa">Higher or equal mean and lower or equal variance, one strict.</div></div>
+<div class="ol"><div class="oq">Assumptions behind E-V?</div><div class="oa">Risk aversion plus normality or quadratic utility.</div></div>
+<div class="ol"><div class="oq">A/B/C example E-V efficient set?</div><div class="oa">{B, C}.</div></div>
+<div class="ol"><div class="oq">Who picks A in the A/B/C example?</div><div class="oa">A safety-first person looking only at the worst outcome.</div></div>
+<div class="ol"><div class="oq">Cotton expected-profit choice?</div><div class="oa">A2.</div></div>
+<div class="ol"><div class="oq">Cotton E-V efficient set?</div><div class="oa">{A2, A3}.</div></div>
+<div class="ol"><div class="oq">Name two weaknesses of E-V.</div><div class="oa">Large efficient sets; differs from SSD without normality (and can't rank higher-mean-higher-variance pairs).</div></div>
+<div class="ol"><div class="oq">How does a higher variance show in a CDF?</div><div class="oa">A flatter CDF.</div></div>
+<div class="ol"><div class="oq">How does a lower mean show in a CDF?</div><div class="oa">More of the CDF to the left.</div></div>
+<div class="ol"><div class="oq">FSD condition?</div><div class="oa">\(F(\pi)\le G(\pi)\) for all π.</div></div>
+<div class="ol"><div class="oq">FSD assumption?</div><div class="oa">\(u'&gt;0\) only.</div></div>
+<div class="ol"><div class="oq">Advantage and disadvantage of FSD?</div><div class="oa">Weak assumption; not discriminating.</div></div>
+<div class="ol"><div class="oq">SSD condition?</div><div class="oa">Integrated CDF of F ≤ that of G everywhere.</div></div>
+<div class="ol"><div class="oq">SSD assumptions?</div><div class="oa">\(u'&gt;0\) and \(u''&lt;0\).</div></div>
+<div class="ol"><div class="oq">Can CDFs cross under SSD?</div><div class="oa">Yes; the integrated CDFs cannot.</div></div>
+<div class="ol"><div class="oq">FSD but not SSD: possible?</div><div class="oa">No.</div></div>
+<div class="ol"><div class="oq">FSD but not E-V: possible?</div><div class="oa">Yes; FSD does not imply lower variance.</div></div>
+<div class="ol"><div class="oq">What does third-degree SD add?</div><div class="oa">An assumption on \(u'''\) (skewness preference).</div></div>
+<div class="ol"><div class="oq">Why title-case "Second-Degree"?</div><div class="oa">"Second" is a word, not a prefix; hyphen because it modifies "degree."</div></div>
+<div class="ol"><div class="oq">What does SDRF stand for and who developed it?</div><div class="oa">Stochastic dominance with respect to a function; Jack Meyer.</div></div>
+<div class="ol"><div class="oq">SDRF bounds for FSD and SSD?</div><div class="oa">FSD: (−∞, ∞). SSD: [0, ∞).</div></div>
+<div class="ol"><div class="oq">What does SERF stand for and who developed it?</div><div class="oa">Stochastic efficiency with respect to a function; James Richardson.</div></div>
+<div class="ol"><div class="oq">SDRF vs SERF in one line?</div><div class="oa">SDRF leaves utility form unspecified; SERF picks a family and compares CEs.</div></div>
+<div class="ol"><div class="oq">How do you read a SERF graph?</div><div class="oa">The highest CE curve at each r is preferred; crossings are switch points.</div></div>
+<div class="ol"><div class="oq">Shape of a certain payoff on a SERF graph?</div><div class="oa">Horizontal line.</div></div>
+<div class="ol"><div class="oq">CE at r = 0?</div><div class="oa">The mean.</div></div>
+<div class="ol"><div class="oq">Convex-set stochastic dominance?</div><div class="oa">Dominance by a feasible mixture of other alternatives.</div></div>
+</template>

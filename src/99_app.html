@@ -1,0 +1,760 @@
+
+<!-- ===================== APP SHELL (no need to edit below to add content) ===================== -->
+<div class="shell">
+  <div class="topbar" id="topbar">
+    <button class="iconbtn" id="backbtn" aria-label="Back" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 id="toptitle">AGEC 6403 Study App</h1>
+    <button class="iconbtn" id="themebtn" aria-label="Switch light or dark theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg></button>
+  </div>
+  <main id="view"></main>
+</div>
+<div class="tabbar"><nav id="tabs">
+  <a href="#home" data-t="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zm0 0A2 2 0 0 0 6 22h13"/><path d="M9 7h6M9 11h6"/></svg>Learn</a>
+  <a href="#practice" data-t="practice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.5a3 3 0 0 1 5.6 1c0 2-3 2.5-3 4.5M12 17.5h.01"/></svg>Practice</a>
+  <a href="#cards" data-t="cards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="6" width="14" height="14" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v12"/></svg>Cards</a>
+  <a href="#tools" data-t="tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 20h18M6 16l4-5 3 3 5-7"/></svg>Labs</a>
+  <a href="#more" data-t="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>More</a>
+</nav></div>
+
+<script>
+(function () {
+"use strict";
+/* ---------- state (saved only in this browser) ---------- */
+const KEY = 'agec6403-study-v1';
+let S = { done: {}, quiz: {}, notes: {}, cards: [], last: null, got: {}, check: {}, theme: '' };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch (e) {}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const view = $('#view');
+
+/* ---------- read the content templates ---------- */
+const CH = $$('template[data-chapter]').map(t => ({ n: t.dataset.chapter, title: t.dataset.title, blurb: t.dataset.blurb || '', dates: t.dataset.dates || '', part: t.dataset.part || '', color: t.dataset.color || '1', preview: t.hasAttribute('data-preview') }));
+const LES = $$('template[data-lesson]').map(t => ({ id: t.dataset.lesson, ch: t.dataset.ch, title: t.dataset.title, src: t.dataset.src || '', yt: t.dataset.yt || '', t }));
+const REV = {}; $$('template[data-review]').forEach(t => { REV[t.dataset.review] = t; });
+const PAGES = {}; $$('template[data-page]').forEach(t => { PAGES[t.dataset.page] = t; });
+const chOf = n => CH.find(c => c.n === n);
+const lesOf = n => LES.filter(l => l.ch === n);
+const chc = n => 'var(--c' + ((chOf(n) || {}).color || 1) + ')';
+const sec = (l, s) => l.t.content.querySelector('section[data-s="' + s + '"]');
+
+/* collect quiz questions and flashcards from every lesson */
+const QUIZ = [], CARDS = [];
+LES.forEach(l => {
+  const q = sec(l, 'quiz');
+  if (q) $$('.q', q).forEach((el, i) => QUIZ.push({ lesson: l.id, ch: l.ch, i, a: +el.dataset.a, stem: $('.stem', el).innerHTML, opts: $$('ol > li', el).map(x => x.innerHTML), why: ($('.why', el) || { innerHTML: '' }).innerHTML }));
+  const c = sec(l, 'cards');
+  if (c) $$('.fc', c).forEach(el => CARDS.push({ lesson: l.id, ch: l.ch, f: $('.f', el).innerHTML, b: $('.b', el).innerHTML }));
+});
+const revItems = n => REV[n] ? $$('.ol', REV[n].content) : [];
+
+/* ---------- MathJax ---------- */
+const pendingTypeset = [];
+function typeset(el) {
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([el]).catch(() => {});
+  else pendingTypeset.push(el);
+}
+const mjWait = setInterval(() => {
+  if (window.MathJax && MathJax.typesetPromise) { clearInterval(mjWait); pendingTypeset.splice(0).forEach(el => { if (el.isConnected) typeset(el); }); }
+}, 150);
+
+/* ---------- small helpers ---------- */
+function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 1700); }
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function copyText(txt, btn) {
+  const done = () => toast('Copied');
+  try { navigator.clipboard.writeText(txt).then(done, () => fallback()); } catch (e) { fallback(); }
+  function fallback() { const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) { toast('Select the text and copy it'); } ta.remove(); }
+}
+function setTop(title, back) { $('#toptitle').textContent = title; $('#backbtn').hidden = !back; }
+$('#backbtn').onclick = () => { if (history.length > 1) history.back(); else location.hash = '#home'; };
+window.addEventListener('scroll', () => $('#topbar').classList.toggle('scrolled', window.scrollY > 4), { passive: true });
+
+/* theme: system -> light -> dark */
+function applyTheme() { if (S.theme) document.documentElement.setAttribute('data-theme', S.theme); else document.documentElement.removeAttribute('data-theme'); redrawAll(); }
+$('#themebtn').onclick = () => { S.theme = S.theme === '' ? 'light' : S.theme === 'light' ? 'dark' : ''; save(); applyTheme(); toast(S.theme ? (S.theme === 'dark' ? 'Dark theme' : 'Light theme') : 'Theme follows your device'); };
+
+/* ---------- quiz widget ---------- */
+function quizCard(q, num, onAnswer) {
+  const el = document.createElement('div'); el.className = 'q';
+  el.innerHTML = '<div class="qn">Question ' + num + (q.lesson ? ' · ' + esc(lessonTitle(q.lesson)) : '') + '</div><div class="stem">' + q.stem + '</div><div class="opts"></div>';
+  const box = $('.opts', el);
+  q.opts.forEach((o, i) => {
+    const b = document.createElement('button'); b.className = 'opt'; b.type = 'button';
+    b.innerHTML = '<span class="k">' + 'ABCDEF'[i] + '</span><span class="v">' + o + '</span>';
+    b.onclick = () => {
+      $$('.opt', box).forEach((x, j) => { x.disabled = true; if (j === q.a) x.classList.add('right'); });
+      const ok = i === q.a; if (!ok) b.classList.add('wrong');
+      const w = document.createElement('div'); w.className = 'why' + (ok ? '' : ' no');
+      w.innerHTML = '<b>' + (ok ? 'Correct.' : 'Not quite. The answer is ' + 'ABCDEF'[q.a] + '.') + '</b> ' + q.why;
+      el.appendChild(w); typeset(w); onAnswer && onAnswer(ok);
+    };
+    box.appendChild(b);
+  });
+  return el;
+}
+const lessonTitle = id => (LES.find(l => l.id === id) || {}).title || '';
+
+/* ---------- pages ---------- */
+function home() {
+  setTop('AGEC 6403 Study App', false);
+  const total = LES.length, done = LES.filter(l => S.done[l.id]).length;
+  let qc = 0, qt = 0; Object.values(S.quiz).forEach(v => { qc += v.c; qt += v.t; });
+  const allRev = CH.reduce((a, c) => a + revItems(c.n).length, 0);
+  const gotRev = Object.values(S.got).filter(v => v === 1).length;
+  const last = LES.find(l => l.id === S.last) || LES.find(l => !S.done[l.id]) || LES[0];
+  let h = '<div class="hero"><div class="eyebrow">AGEC 6403 · Advanced Production · Fall 2026</div>' +
+    '<h2 class="display">From the experiment to the decision.</h2>' +
+    '<p class="muted">Every topic from the syllabus and the lectures (Aug 31 to Oct 30): data generating processes, expected-profit maximization, plateau functions, Bayesian estimation, risk, stochastic dominance and numerical integration. Each chapter ends with one-line review questions.</p></div>';
+  if (last) h += '<a class="continue" href="#' + last.id + '"><div><div class="eyebrow">' + (S.last ? 'Continue' : 'Start here') + ' · Chapter ' + last.ch + '</div><strong>' + last.title + '</strong></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></a>';
+  h += '<div class="overall"><div class="stat"><b>' + done + '/' + total + '</b><span>lessons done</span></div><div class="stat"><b>' + (qt ? Math.round(100 * qc / qt) + '%' : '–') + '</b><span>quiz accuracy</span></div><div class="stat"><b>' + gotRev + '/' + allRev + '</b><span>one-liners known</span></div></div>';
+  let part = '';
+  CH.forEach(c => {
+    if (c.part && c.part !== part) { part = c.part; h += '<div class="part"><div class="eyebrow">Syllabus part</div><h3>' + c.part + '</h3></div>'; }
+    const ls = lesOf(c.n), dn = ls.filter(l => S.done[l.id]).length;
+    const ri = revItems(c.n).length, rg = revItems(c.n).filter((_, i) => S.got[c.n + ':' + i] === 1).length;
+    h += '<section class="chapter" style="--chc:' + chc(c.n) + '"><header><div class="chnum">' + c.n + '</div><h3>' + c.title + (c.preview ? ' <span class="preview">Preview</span>' : '') + '</h3><div class="src">' + c.dates + '</div></header>' +
+      '<div class="meter"><i style="width:' + (ls.length ? 100 * dn / ls.length : 0) + '%"></i></div><ul class="lessons">';
+    ls.forEach(l => {
+      const qs = S.quiz[l.id];
+      h += '<li><a href="#' + l.id + '"><span class="ldot' + (S.done[l.id] ? ' done' : '') + '"></span><span class="lt"><b>' + l.title + '</b><span>' + l.src + '</span></span>' + (qs ? '<span class="qbadge">' + qs.c + '/' + qs.t + '</span>' : '') + '</a></li>';
+    });
+    if (ri) h += '<li><a href="#review-' + c.n + '"><span class="ldot rev' + (rg === ri ? ' done' : '') + '"></span><span class="lt"><b>Chapter review: one-line questions</b><span>' + ri + ' questions on everything in this chapter</span></span>' + (rg ? '<span class="qbadge">' + rg + '/' + ri + '</span>' : '') + '</a></li>';
+    h += '</ul></section>';
+  });
+  view.innerHTML = h; typeset(view);
+}
+
+let lessonTab = 'learn';
+function lesson(l) {
+  S.last = l.id; save();
+  const c = chOf(l.ch) || { title: '' };
+  setTop('Chapter ' + l.ch + ' · ' + c.title, true);
+  const tabs = [['learn', 'Learn'], ['examples', 'Examples'], ['watch', 'Watch'], ['quiz', 'Quiz'], ['cards', 'Cards'], ['notes', 'My notes']].filter(([k]) => k === 'notes' || sec(l, k));
+  if (!tabs.find(t => t[0] === lessonTab)) lessonTab = tabs[0][0];
+  const count = k => { const s = sec(l, k); if (!s) return ''; const n = k === 'quiz' ? $$('.q', s).length : k === 'cards' ? $$('.fc', s).length : k === 'examples' ? $$('details', s).length : k === 'watch' ? $$('a.vid', s).length : 0; return n ? '<span class="n">' + n + '</span>' : ''; };
+  view.innerHTML = '<div class="lhead" style="--chc:' + chc(l.ch) + '"><a class="chip" href="#home">Chapter ' + l.ch + ' · ' + c.title + '</a><h2 class="display">' + l.title + '</h2><div class="muted">' + l.src + '</div></div>' +
+    '<div class="seg" role="tablist">' + tabs.map(([k, n]) => '<button type="button" data-k="' + k + '" class="' + (k === lessonTab ? 'on' : '') + '">' + n + count(k) + '</button>').join('') + '</div><div class="pane" id="pane"></div><div id="foot"></div>';
+  $$('.seg button', view).forEach(b => b.onclick = () => { lessonTab = b.dataset.k; $$('.seg button', view).forEach(x => x.classList.toggle('on', x === b)); renderPane(l); });
+  renderPane(l); renderFoot(l);
+}
+function renderPane(l) {
+  stopTools();
+  const pane = $('#pane'); pane.innerHTML = '';
+  const k = lessonTab;
+  if (k === 'notes') {
+    pane.innerHTML = '<h3>My notes for this lesson</h3><p class="muted">Type anything you want to remember: what the professor stressed, your own examples, questions to ask. Notes are saved in this browser only; use Copy to keep a backup.</p><textarea class="notes" id="note-' + l.id + '" placeholder="Your notes…"></textarea><div class="row"><button class="btn sm" type="button" id="copynote">Copy notes</button><span class="muted" id="notestate"></span></div>';
+    const ta = $('textarea', pane); ta.value = S.notes[l.id] || '';
+    let tm; ta.oninput = () => { clearTimeout(tm); tm = setTimeout(() => { S.notes[l.id] = ta.value; if (!ta.value) delete S.notes[l.id]; save(); $('#notestate').textContent = 'Saved'; }, 300); };
+    $('#copynote').onclick = () => copyText(ta.value);
+    return;
+  }
+  const s = sec(l, k); if (!s) return;
+  const node = s.cloneNode(true);
+  if (k === 'watch') {
+    $$('a.vid', node).forEach(a => {
+      const title = a.textContent.trim();
+      a.target = '_blank'; a.rel = 'noopener';
+      a.innerHTML = '<span class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><div>' + (a.dataset.tag ? '<div class="tag">' + esc(a.dataset.tag) + '</div>' : '') + '<b>' + esc(title) + '</b><small>' + esc(a.dataset.by || 'YouTube') + '</small></div>';
+    });
+    const q = l.yt || l.title;
+    const more = document.createElement('a'); more.className = 'ytsearch'; more.target = '_blank'; more.rel = 'noopener';
+    more.href = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
+    more.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Search YouTube for more: “' + esc(q) + '”';
+    node.appendChild(more);
+    pane.appendChild(node);
+  } else if (k === 'quiz') {
+    const qs = QUIZ.filter(q => q.lesson === l.id);
+    let c = 0, t = 0;
+    const bar = document.createElement('div'); bar.className = 'scorebar'; bar.hidden = true;
+    qs.forEach((q, i) => pane.appendChild(quizCard(Object.assign({}, q, { lesson: null }), i + 1, ok => {
+      t++; if (ok) c++;
+      if (t === qs.length) {
+        const prev = S.quiz[l.id]; if (!prev || c >= prev.c) S.quiz[l.id] = { c, t }; save();
+        bar.hidden = false; bar.innerHTML = '<b>' + c + '/' + t + '</b><span>' + (c === t ? 'All correct.' : 'Review the explanations, then try again.') + '</span><button class="btn sm" type="button">Try again</button>';
+        $('button', bar).onclick = () => renderPane(l);
+      }
+    })));
+    pane.appendChild(bar);
+  } else if (k === 'cards') {
+    const wrap = document.createElement('div'); wrap.className = 'mini-flash';
+    $$('.fc', node).forEach(fc => {
+      const d = document.createElement('div'); d.className = 'fc';
+      d.innerHTML = '<button type="button">' + $('.f', fc).innerHTML + '</button><div class="bk">' + $('.b', fc).innerHTML + '</div>';
+      $('button', d).onclick = () => d.classList.toggle('open');
+      wrap.appendChild(d);
+    });
+    pane.innerHTML = '<p class="muted">Tap a card to see the answer. All cards also appear in the Cards tab.</p>'; pane.appendChild(wrap);
+  } else {
+    pane.appendChild(node);
+    $$('[data-tool]', pane).forEach(el => mountTool(el, el.dataset.tool, el.dataset.preset));
+  }
+  typeset(pane);
+}
+function renderFoot(l) {
+  const ls = LES, i = ls.indexOf(l), prev = ls[i - 1], next = ls[i + 1];
+  const chLs = lesOf(l.ch), lastInCh = chLs[chLs.length - 1] === l;
+  let h = '';
+  if (lastInCh && REV[l.ch]) h += '<a class="reviewcta" style="--chc:' + chc(l.ch) + '" href="#review-' + l.ch + '"><span class="ldot rev"></span><span><b>Finish Chapter ' + l.ch + ' with the one-line review</b><span class="muted">' + revItems(l.ch).length + ' quick questions covering the whole chapter</span></span></a>';
+  h += '<div class="lessonfoot">' + (prev ? '<a class="btn" href="#' + prev.id + '">← Previous</a>' : '<span></span>') +
+    '<button class="btn ' + (S.done[l.id] ? 'good' : 'primary') + '" id="donebtn" type="button">' + (S.done[l.id] ? 'Done ✓' : 'Mark done') + '</button>' +
+    (next ? '<a class="btn" href="#' + next.id + '">Next →</a>' : '<span></span>') + '</div>';
+  $('#foot').innerHTML = h;
+  $('#donebtn').onclick = () => { S.done[l.id] = !S.done[l.id]; if (!S.done[l.id]) delete S.done[l.id]; save(); renderFoot(l); if (S.done[l.id]) toast('Lesson marked done'); };
+}
+
+function review(n) {
+  stopTools();
+  const c = chOf(n); if (!c || !REV[n]) return home();
+  setTop('Chapter ' + n + ' review', true);
+  const items = revItems(n);
+  view.innerHTML = '<div class="lhead" style="--chc:' + chc(n) + '"><a class="chip" href="#home">Chapter ' + n + ' · ' + c.title + '</a><h2 class="display">One-line review</h2><p class="muted">One short question for every idea in this chapter. Answer it in your head, tap Show, then mark whether you knew it.</p></div>' +
+    '<div class="row"><button class="btn sm" id="showall" type="button">Show all answers</button><button class="btn sm" id="hideall" type="button">Hide all</button><button class="btn sm" id="onlymiss" type="button">Only ones I missed</button><span class="muted" id="revcount"></span></div><div id="ollist"></div>' +
+    '<div class="lessonfoot"><a class="btn" href="#' + (lesOf(n)[0] || {}).id + '">Back to lessons</a><span></span>' + (chOf(String(+n + 1)) ? '<a class="btn primary" href="#' + ((lesOf(String(+n + 1))[0]) || {}).id + '">Next chapter →</a>' : '<span></span>') + '</div>';
+  const list = $('#ollist');
+  const count = () => { const g = items.filter((_, i) => S.got[n + ':' + i] === 1).length; $('#revcount').textContent = g + ' of ' + items.length + ' known'; };
+  items.forEach((it, i) => {
+    const k = n + ':' + i;
+    const d = document.createElement('div'); d.className = 'ol' + (S.got[k] === 1 ? ' got' : '');
+    d.innerHTML = '<span class="no">' + (i + 1) + '</span><div class="oq">' + $('.oq', it).innerHTML + '</div><button class="show" type="button">Show</button><div class="oa">' + $('.oa', it).innerHTML + '</div><div class="gotit"><button class="btn sm good" type="button" data-v="1">I knew it</button><button class="btn sm" type="button" data-v="0">Review again</button></div>';
+    $('.show', d).onclick = () => { d.classList.toggle('open'); $('.show', d).textContent = d.classList.contains('open') ? 'Hide' : 'Show'; };
+    $$('.gotit button', d).forEach(b => b.onclick = () => { S.got[k] = +b.dataset.v; save(); d.classList.toggle('got', S.got[k] === 1); d.classList.remove('open'); $('.show', d).textContent = 'Show'; count(); });
+    list.appendChild(d);
+  });
+  $('#showall').onclick = () => $$('.ol', list).forEach(d => { d.classList.add('open'); $('.show', d).textContent = 'Hide'; });
+  $('#hideall').onclick = () => $$('.ol', list).forEach(d => { d.classList.remove('open'); d.hidden = false; $('.show', d).textContent = 'Show'; });
+  $('#onlymiss').onclick = () => $$('.ol', list).forEach((d, i) => { d.hidden = S.got[n + ':' + i] === 1; });
+  count(); typeset(view);
+}
+
+let pFilter = 'all';
+function practice() {
+  stopTools();
+  setTop('Practice', false);
+  const pool = QUIZ.filter(q => pFilter === 'all' || q.ch === pFilter);
+  const set = shuffle(pool).slice(0, 10);
+  view.innerHTML = '<h2 class="display">Practice quiz</h2><p class="muted">Ten random questions from the lesson quizzes (' + QUIZ.length + ' in the bank). Pick a chapter or mix them all.</p>' +
+    '<div class="filter">' + [['all', 'All chapters']].concat(CH.filter(c => QUIZ.some(q => q.ch === c.n)).map(c => [c.n, 'Ch ' + c.n])).map(([k, n]) => '<button type="button" data-k="' + k + '" class="' + (k === pFilter ? 'on' : '') + '">' + n + '</button>').join('') + '</div>' +
+    '<div class="pbar"><i id="pb" style="width:0"></i></div><div id="plist"></div><div class="scorebar" id="pscore" hidden></div>';
+  $$('.filter button', view).forEach(b => b.onclick = () => { pFilter = b.dataset.k; practice(); });
+  let c = 0, t = 0;
+  set.forEach((q, i) => $('#plist').appendChild(quizCard(q, i + 1, ok => {
+    t++; if (ok) c++; $('#pb').style.width = (100 * t / set.length) + '%';
+    if (t === set.length) { const sb = $('#pscore'); sb.hidden = false; sb.innerHTML = '<b>' + c + '/' + t + '</b><span>' + (c >= 8 ? 'Strong work.' : 'Open the lessons for the ones you missed.') + '</span><button class="btn sm primary" type="button">New set</button>'; $('button', sb).onclick = () => { practice(); window.scrollTo(0, 0); }; }
+  })));
+  if (!set.length) $('#plist').innerHTML = '<div class="empty">No questions in this chapter yet.</div>';
+  typeset(view);
+}
+
+let cFilter = 'all', cIdx = 0, cOrder = null;
+function deck() {
+  const mine = S.cards.map((c, i) => ({ ch: c.ch || 'mine', f: esc(c.f), b: esc(c.b), mine: true, i }));
+  if (cFilter === 'mine') return mine;
+  const base = CARDS.concat(mine.map(m => Object.assign({}, m, { ch: m.ch === 'mine' ? '' : m.ch })));
+  return cFilter === 'all' ? base : base.filter(c => c.ch === cFilter);
+}
+function cardsPage() {
+  stopTools();
+  setTop('Flashcards', false);
+  let d = deck(); if (cOrder && cOrder.length === d.length) d = cOrder.map(i => d[i]); else cOrder = null;
+  if (cIdx >= d.length) cIdx = 0;
+  const chips = [['all', 'All']].concat(CH.filter(c => CARDS.some(x => x.ch === c.n)).map(c => [c.n, 'Ch ' + c.n]), [['mine', 'My cards']]);
+  let h = '<h2 class="display">Flashcards</h2><p class="muted">' + CARDS.length + ' cards from the lessons, plus any you add below. Tap the card to flip.</p>' +
+    '<div class="filter">' + chips.map(([k, n]) => '<button type="button" data-k="' + k + '" class="' + (k === cFilter ? 'on' : '') + '">' + n + '</button>').join('') + '</div>';
+  if (d.length) {
+    const c = d[cIdx];
+    h += '<div class="flash" id="flash"><div class="inner"><div class="face"><div class="eyebrow">' + (c.mine ? 'My card' : 'Chapter ' + c.ch + ' · ' + esc(lessonTitle(c.lesson))) + '</div><div class="content">' + c.f + '</div><div class="hint">Tap to flip</div></div><div class="face back"><div class="eyebrow">Answer</div><div class="content">' + c.b + '</div></div></div></div>' +
+      '<div class="row" style="justify-content:space-between"><button class="btn" id="cprev" type="button">← Prev</button><span class="mono muted">' + (cIdx + 1) + ' / ' + d.length + '</span><button class="btn" id="cshuf" type="button">Shuffle</button><button class="btn primary" id="cnext" type="button">Next →</button></div>';
+  } else h += '<div class="empty">No cards here yet. Add one below.</div>';
+  h += '<h3>Add your own card</h3><div class="card"><div class="field"><label for="nf">Front (question)</label><input id="nf" placeholder="e.g. What is the switch point in a linear plateau?"></div><div class="field"><label for="nb">Back (answer)</label><textarea id="nb" rows="3" placeholder="e.g. N where α + βN = P, so N = (P − α)/β"></textarea></div><div class="field"><label for="nc">Chapter</label><select id="nc"><option value="">No chapter</option>' + CH.map(c => '<option value="' + c.n + '">Ch ' + c.n + ' · ' + esc(c.title) + '</option>').join('') + '</select></div><button class="btn primary" id="addcard" type="button">Add card</button></div>';
+  if (S.cards.length) h += '<h3>My cards</h3>' + S.cards.map((c, i) => '<div class="ol"><span class="no">' + (i + 1) + '</span><div class="oq">' + esc(c.f) + '<div class="muted">' + esc(c.b) + '</div></div><button class="show" type="button" data-del="' + i + '">Delete</button></div>').join('');
+  view.innerHTML = h;
+  $$('.filter button', view).forEach(b => b.onclick = () => { cFilter = b.dataset.k; cIdx = 0; cOrder = null; cardsPage(); });
+  const fl = $('#flash'); if (fl) fl.onclick = () => fl.classList.toggle('flipped');
+  if ($('#cprev')) { $('#cprev').onclick = () => { cIdx = (cIdx - 1 + d.length) % d.length; cardsPage(); }; $('#cnext').onclick = () => { cIdx = (cIdx + 1) % d.length; cardsPage(); }; $('#cshuf').onclick = () => { cOrder = shuffle(d.map((_, i) => i)); cIdx = 0; cardsPage(); toast('Shuffled'); }; }
+  $('#addcard').onclick = () => { const f = $('#nf').value.trim(), b = $('#nb').value.trim(); if (!f || !b) { toast('Fill in the front and back'); return; } S.cards.push({ f, b, ch: $('#nc').value }); save(); toast('Card added'); cardsPage(); };
+  $$('[data-del]', view).forEach(b => b.onclick = () => { if (b.dataset.armed) { S.cards.splice(+b.dataset.del, 1); save(); cardsPage(); } else { b.dataset.armed = 1; b.textContent = 'Confirm'; } });
+  typeset(view);
+}
+
+function toolsPage() {
+  stopTools();
+  setTop('Labs', false);
+  view.innerHTML = '<h2 class="display">Interactive labs</h2><p class="muted">Calculators for the models in class. Change the inputs and watch the optimum, the certainty equivalent or the efficient set move.</p><div class="toollist">' +
+    Object.entries(TOOLS).map(([k, t]) => '<a href="#tool-' + k + '" style="--chc:' + chc(t.ch) + '"><span class="ico">' + t.ico + '</span><div><b>' + t.title + '</b><small>Chapter ' + t.ch + ' · ' + t.desc + '</small></div></a>').join('') + '</div>';
+}
+function toolPage(k) {
+  stopTools();
+  const t = TOOLS[k]; if (!t) return toolsPage();
+  setTop('Labs · ' + t.title, true);
+  view.innerHTML = '<div class="lhead" style="--chc:' + chc(t.ch) + '"><a class="chip" href="#tools">Chapter ' + t.ch + ' lab</a><h2 class="display">' + t.title + '</h2><p class="muted">' + t.desc + '</p></div><div class="tool" id="toolhost"></div>';
+  mountTool($('#toolhost'), k);
+}
+
+function more() {
+  stopTools();
+  setTop('More', false);
+  const pages = [['page-exam', 'Exam prep', 'Study-guide checklist, exam hints from class, old-exam question types', 'E'], ['page-glossary', 'Glossary', 'Every vocabulary term from the course, searchable', 'G'], ['notes', 'My notes', 'All the notes you wrote in lessons, in one place', 'N'], ['page-howto', 'How to add content', 'Add lessons, questions, videos and chapters later', '+']];
+  view.innerHTML = '<h2 class="display">More</h2><div class="toollist">' + pages.map(([h, t, d, i]) => '<a href="#' + h + '" style="--chc:var(--c' + (i === 'E' ? 3 : i === 'G' ? 2 : i === 'N' ? 6 : 1) + ')"><span class="ico">' + i + '</span><div><b>' + t + '</b><small>' + d + '</small></div></a>').join('') + '</div>' +
+    '<h3>Theme</h3><div class="filter" id="themes">' + [['', 'Match device'], ['light', 'Light'], ['dark', 'Dark']].map(([k, n]) => '<button type="button" data-k="' + k + '" class="' + (S.theme === k ? 'on' : '') + '">' + n + '</button>').join('') + '</div>' +
+    '<h3>Back up your progress</h3><p class="muted">Progress, notes and your own cards are saved in this browser only. Copy the backup text and paste it here on another device to restore.</p><div class="row"><button class="btn sm" id="exp" type="button">Copy backup</button><button class="btn sm" id="imp" type="button">Restore from pasted text</button></div><textarea class="notes" id="bak" style="min-height:90px" placeholder="Paste backup text here, then press Restore"></textarea>' +
+    '<h3>Start over</h3><button class="btn sm" id="reset" type="button">Reset all progress</button>';
+  $$('#themes button').forEach(b => b.onclick = () => { S.theme = b.dataset.k; save(); applyTheme(); more(); });
+  $('#exp').onclick = () => { const txt = JSON.stringify(S); $('#bak').value = txt; copyText(txt); };
+  $('#imp').onclick = () => { try { const o = JSON.parse($('#bak').value); if (typeof o !== 'object' || !o) throw 0; S = Object.assign(S, o); save(); applyTheme(); toast('Restored'); } catch (e) { toast('That text is not a valid backup'); } };
+  $('#reset').onclick = e => { const b = e.currentTarget; if (b.dataset.armed) { const th = S.theme; S = { done: {}, quiz: {}, notes: {}, cards: [], last: null, got: {}, check: {}, theme: th }; save(); toast('Progress reset'); more(); } else { b.dataset.armed = 1; b.textContent = 'Tap again to erase everything'; } };
+}
+
+function notesPage() {
+  stopTools();
+  setTop('My notes', true);
+  const ids = Object.keys(S.notes).filter(k => S.notes[k]);
+  view.innerHTML = '<h2 class="display">My notes</h2>' + (ids.length ? '<div class="row"><button class="btn sm" id="copyall" type="button">Copy all notes</button></div>' + ids.map(id => '<div class="card" style="margin:12px 0"><a href="#' + id + '"><b>' + esc(lessonTitle(id) || id) + '</b></a><p style="white-space:pre-wrap">' + esc(S.notes[id]) + '</p></div>').join('') : '<div class="empty">No notes yet. Open any lesson and use the “My notes” tab.</div>');
+  const b = $('#copyall'); if (b) b.onclick = () => copyText(ids.map(id => '## ' + lessonTitle(id) + '\n' + S.notes[id]).join('\n\n'));
+}
+
+function page(k) {
+  stopTools();
+  const t = PAGES[k]; if (!t) return more();
+  setTop(t.dataset.title || 'Page', true);
+  view.innerHTML = ''; view.appendChild(t.content.cloneNode(true));
+  if (k === 'glossary') {
+    const inp = document.createElement('input'); inp.className = 'search'; inp.type = 'search'; inp.id = 'glsearch'; inp.placeholder = 'Search terms…';
+    const dl = $('dl.gloss', view); dl.before(inp);
+    inp.oninput = () => { const q = inp.value.toLowerCase(); $$('dt', dl).forEach(dt => { const dd = dt.nextElementSibling; const hit = !q || (dt.textContent + ' ' + dd.textContent).toLowerCase().includes(q); dt.hidden = dd.hidden = !hit; }); };
+  }
+  $$('.checklist input[type=checkbox]', view).forEach((cb, i) => { const key = k + ':' + i; cb.checked = !!S.check[key]; cb.onchange = () => { S.check[key] = cb.checked ? 1 : 0; save(); }; });
+  typeset(view);
+}
+
+/* ---------- router ---------- */
+function route() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  window.scrollTo(0, 0);
+  let tab = 'home';
+  if (!h || h === 'home') home();
+  else if (h === 'practice') { tab = 'practice'; practice(); }
+  else if (h === 'cards') { tab = 'cards'; cardsPage(); }
+  else if (h === 'tools') { tab = 'tools'; toolsPage(); }
+  else if (h.indexOf('tool-') === 0) { tab = 'tools'; toolPage(h.slice(5)); }
+  else if (h === 'more') { tab = 'more'; more(); }
+  else if (h === 'notes') { tab = 'more'; notesPage(); }
+  else if (h.indexOf('page-') === 0) { tab = 'more'; page(h.slice(5)); }
+  else if (h.indexOf('review-') === 0) review(h.slice(7));
+  else { const l = LES.find(x => x.id === h); if (l) { if (S._lastLesson !== l.id) lessonTab = 'learn'; S._lastLesson = l.id; lesson(l); } else home(); }
+  $$('#tabs a').forEach(a => a.classList.toggle('on', a.dataset.t === tab));
+}
+window.addEventListener('hashchange', route);
+
+/* =====================================================================
+   LABS (interactive tools). Each tool: TOOLS.name = {title, ch, ico, desc, init(root, preset)}
+   init returns a draw() function that is re-run on resize / theme change.
+   ===================================================================== */
+let ACTIVE = [];
+function stopTools() { ACTIVE = []; }
+function redrawAll() { ACTIVE.forEach(f => { try { f(); } catch (e) {} }); }
+let rzt; window.addEventListener('resize', () => { clearTimeout(rzt); rzt = setTimeout(redrawAll, 120); });
+try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redrawAll); } catch (e) {}
+let uidN = 0;
+function mountTool(el, name, preset) {
+  const t = TOOLS[name]; if (!t) return;
+  el.classList.add('tool'); el.innerHTML = '';
+  const head = document.createElement('div'); head.className = 'th'; head.innerHTML = '<span class="badge">Lab</span><b>' + t.title + '</b>';
+  el.appendChild(head);
+  const body = document.createElement('div'); el.appendChild(body);
+  const draw = t.init(body, preset, 'u' + (++uidN));
+  if (draw) { ACTIVE.push(draw); draw(); }
+}
+
+/* math helpers */
+const SQ2PI = Math.sqrt(2 * Math.PI);
+function phi(z) { return Math.exp(-z * z / 2) / SQ2PI; }
+function Phi(z) { const t = 1 / (1 + 0.2316419 * Math.abs(z)); const d = 0.3989422804014327 * Math.exp(-z * z / 2); const p = d * t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429)))); return z > 0 ? 1 - p : p; }
+function invPhi(p) {
+  if (p <= 0) return -Infinity; if (p >= 1) return Infinity;
+  const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+  const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+  const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+  const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+  const pl = 0.02425; let q, r;
+  if (p < pl) { q = Math.sqrt(-2 * Math.log(p)); return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1); }
+  if (p <= 1 - pl) { q = p - 0.5; r = q * q; return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q / (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1); }
+  q = Math.sqrt(-2 * Math.log(1 - p)); return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+}
+function fmt(x, d = 2) { if (!isFinite(x)) return x > 0 ? '∞' : x < 0 ? '−∞' : '–'; const s = Math.abs(x) >= 1e5 ? x.toExponential(2) : x.toFixed(d); return s.replace('-', '−'); }
+function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function niceTicks(a, b, n) { const span = b - a; if (!(span > 0)) return [a]; let step = Math.pow(10, Math.floor(Math.log10(span / n))); const e = span / n / step; if (e >= 7.5) step *= 10; else if (e >= 3.5) step *= 5; else if (e >= 1.5) step *= 2; const out = []; for (let v = Math.ceil(a / step - 1e-9) * step; v <= b + step * 1e-6; v += step) out.push(+v.toFixed(10)); return out; }
+function mulberry(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+/* canvas plot helper */
+function plot(cv, o) {
+  const dpr = window.devicePixelRatio || 1, W = Math.max(260, cv.clientWidth || 600), H = o.h || 250;
+  cv.width = W * dpr; cv.height = H * dpr; cv.style.height = H + 'px';
+  const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
+  const m = { l: 52, r: 14, t: 14, b: 40 };
+  const X = x => m.l + (x - o.x0) / (o.x1 - o.x0) * (W - m.l - m.r);
+  const Y = y => H - m.b - (y - o.y0) / (o.y1 - o.y0) * (H - m.t - m.b);
+  const ink = css('--ink'), mu = css('--muted'), fb = css('--f-body') || 'sans-serif';
+  c.font = '12px ' + fb; c.strokeStyle = mu; c.fillStyle = mu; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(m.l, m.t); c.lineTo(m.l, H - m.b); c.lineTo(W - m.r, H - m.b); c.stroke();
+  c.textAlign = 'center'; c.textBaseline = 'top';
+  niceTicks(o.x0, o.x1, Math.max(3, Math.floor((W - 80) / 70))).forEach(v => { const x = X(v); c.beginPath(); c.moveTo(x, H - m.b); c.lineTo(x, H - m.b + 4); c.stroke(); c.fillText(o.xf ? o.xf(v) : fmt(v, Math.abs(v) < 10 && v % 1 ? 2 : 0).replace(/\.00$/, ''), x, H - m.b + 6); });
+  c.textAlign = 'right'; c.textBaseline = 'middle';
+  niceTicks(o.y0, o.y1, 5).forEach(v => { const y = Y(v); c.beginPath(); c.moveTo(m.l - 4, y); c.lineTo(m.l, y); c.stroke(); c.fillText(o.yf ? o.yf(v) : String(+v.toFixed(4)).replace('-', '−'), m.l - 6, y); });
+  c.fillStyle = ink; c.textAlign = 'center'; c.textBaseline = 'bottom'; if (o.xl) c.fillText(o.xl, m.l + (W - m.l - m.r) / 2, H - 2);
+  if (o.yl) { c.save(); c.translate(12, m.t + (H - m.t - m.b) / 2); c.rotate(-Math.PI / 2); c.textBaseline = 'middle'; c.fillText(o.yl, 0, 0); c.restore(); }
+  const clipOn = () => { c.save(); c.beginPath(); c.rect(m.l, m.t - 2, W - m.l - m.r + 2, H - m.t - m.b + 4); c.clip(); };
+  return {
+    c, X, Y, W, H, m,
+    line(pts, col, w = 2, dash = []) { clipOn(); c.strokeStyle = col; c.lineWidth = w; c.setLineDash(dash); c.beginPath(); pts.forEach((p, i) => { const x = X(p[0]), y = Y(p[1]); if (i) c.lineTo(x, y); else c.moveTo(x, y); }); c.stroke(); c.setLineDash([]); c.restore(); },
+    vline(x, col, dash = [5, 4], w = 1.5) { this.line([[x, o.y0], [x, o.y1]], col, w, dash); },
+    hline(y, col, dash = [5, 4], w = 1.5) { this.line([[o.x0, y], [o.x1, y]], col, w, dash); },
+    dot(x, y, col, r = 4.5) { clipOn(); c.fillStyle = col; c.beginPath(); c.arc(X(x), Y(y), r, 0, 7); c.fill(); c.restore(); },
+    text(s, x, y, col, align = 'left', base = 'bottom', dx = 0, dy = 0) { c.fillStyle = col; c.font = '600 12px ' + fb; c.textAlign = align; c.textBaseline = base; c.fillText(s, X(x) + dx, Y(y) + dy); },
+    bar(x, y, col, w = 6) { c.fillStyle = col; c.fillRect(X(x) - w / 2, Y(y), w, Y(o.y0) - Y(y)); }
+  };
+}
+/* controls helper: specs [key,label,min,max,step,value,format] */
+function ctrls(root, uid, specs, onchange, kind) {
+  const box = document.createElement('div'); box.className = 'ctrls';
+  box.innerHTML = specs.map(s => {
+    const id = uid + '-' + s[0];
+    if (kind === 'number' || s[7] === 'number') return '<div class="ctrl"><label for="' + id + '">' + s[1] + '</label><input type="number" id="' + id + '" data-k="' + s[0] + '" min="' + s[2] + '" max="' + s[3] + '" step="' + s[4] + '" value="' + s[5] + '"></div>';
+    return '<div class="ctrl"><label for="' + id + '"><span>' + s[1] + '</span><output id="' + id + '-o"></output></label><input type="range" id="' + id + '" data-k="' + s[0] + '" min="' + s[2] + '" max="' + s[3] + '" step="' + s[4] + '" value="' + s[5] + '"></div>';
+  }).join('');
+  root.appendChild(box);
+  const get = () => { const v = {}; specs.forEach(s => { const el = $('#' + uid + '-' + s[0], box); v[s[0]] = +el.value; const o = $('#' + uid + '-' + s[0] + '-o', box); if (o) o.textContent = s[6] ? s[6](+el.value) : el.value; }); return v; };
+  $$('input', box).forEach(i => i.addEventListener('input', onchange));
+  const set = vals => { Object.entries(vals).forEach(([k, val]) => { const el = $('#' + uid + '-' + k, box); if (el) el.value = val; }); onchange(); };
+  return { get, set, box };
+}
+function readout(root) { const d = document.createElement('div'); d.className = 'readout'; root.appendChild(d); return items => { d.innerHTML = items.map(([k, v, hl]) => '<div' + (hl ? ' class="hl"' : '') + '><span>' + k + '</span><b>' + v + '</b></div>').join(''); }; }
+function legend(root) { const d = document.createElement('div'); d.className = 'legend'; root.appendChild(d); return items => { d.innerHTML = items.map(([col, txt, dash]) => '<span><i style="background:' + col + (dash ? ';background:repeating-linear-gradient(90deg,' + col + ' 0 5px,transparent 5px 9px)' : '') + '"></i>' + txt + '</span>').join(''); }; }
+function canvas(root) { const cv = document.createElement('canvas'); root.appendChild(cv); return cv; }
+function note(root, html) { const p = document.createElement('p'); p.className = 'muted'; p.style.fontSize = '14px'; p.innerHTML = html; root.appendChild(p); return p; }
+
+const TOOLS = {};
+
+/* ---- 1. Stochastic plateau optimizer ---- */
+TOOLS.plateau = {
+  title: 'Stochastic plateau: optimal nitrogen', ch: '3', ico: 'N', desc: 'Linear response with a random plateau. See why the expected-profit optimum is above the average kink.',
+  init(root, preset, uid) {
+    let draw = () => {};
+    const C = ctrls(root, uid, [
+      ['b0', 'Intercept β₀ (bu/ac)', 0, 60, 1, 25, v => v],
+      ['b1', 'Slope β₁ (bu per lb N)', 0.05, 1, 0.01, 0.35, v => v.toFixed(2)],
+      ['mu', 'Mean plateau μ (bu/ac)', 20, 90, 1, 45, v => v],
+      ['sd', 'Plateau SD σ (bu/ac)', 0, 20, 0.5, 6, v => v],
+      ['p', 'Crop price p ($/bu)', 2, 12, 0.1, 6, v => '$' + v.toFixed(2)],
+      ['r', 'N price r ($/lb)', 0.1, 2, 0.01, 0.7, v => '$' + v.toFixed(2)]], () => draw());
+    const cv1 = canvas(root), lg = legend(root), cv2 = canvas(root), ro = readout(root);
+    note(root, 'Expected yield: E(y) = a[1 − Φ(z)] + μΦ(z) − σφ(z), with a = β₀ + β₁N and z = (a − μ)/σ. Optimum: 1 − Φ(z*) = r/(pβ₁), so N* = (μ + σZ<sub>α</sub> − β₀)/β₁.');
+    draw = () => {
+      const v = C.get(), { b0, b1, mu, sd, p, r } = v;
+      const Ey = N => { const a = b0 + b1 * N; if (sd <= 0) return Math.min(a, mu); const z = (a - mu) / sd; return a * (1 - Phi(z)) + mu * Phi(z) - sd * phi(z); };
+      const Epi = N => p * Ey(N) - r * N;
+      const knot = Math.max(0, (mu - b0) / b1), alpha = r / (p * b1);
+      let Ns; if (sd <= 0) Ns = p * b1 > r ? knot : 0; else if (alpha >= 1) Ns = 0; else Ns = Math.max(0, (mu - b0 + sd * invPhi(1 - alpha)) / b1);
+      if (Epi(0) > Epi(Ns)) Ns = 0;
+      const xmax = Math.max(40, (knot + 3 * sd / b1) * 1.25, Ns * 1.2);
+      const ymax = Math.max(mu + 3 * sd, b0) * 1.1;
+      const P = plot(cv1, { x0: 0, x1: xmax, y0: 0, y1: ymax, h: 250, xl: 'Nitrogen rate (lb N/acre)', yl: 'Yield (bu/acre)' });
+      const mutedC = css('--muted'), acc = css('--accent'), wh = css('--wheat'), sky = css('--sky');
+      [0.1, 0.3, 0.5, 0.7, 0.9].forEach(q => { const Pq = mu + sd * invPhi(q); P.line([[0, Math.min(b0, Pq)], [Math.max(0, (Pq - b0) / b1), Pq], [xmax, Pq]], sky, 1, [2, 3]); });
+      P.line([[0, Math.min(b0, mu)], [knot, mu], [xmax, mu]], mutedC, 1.5, [6, 4]);
+      const pts = []; for (let i = 0; i <= 120; i++) { const N = xmax * i / 120; pts.push([N, Ey(N)]); } P.line(pts, acc, 2.5);
+      P.vline(knot, mutedC); P.vline(Ns, wh, [], 2); P.dot(Ns, Ey(Ns), wh);
+      P.text('N* = ' + fmt(Ns, 0), Ns, ymax * 0.06, wh, 'left', 'bottom', 5);
+      const far = knot > xmax * 0.55; P.text('kink at mean plateau', knot, ymax * 0.97, mutedC, far ? 'right' : 'left', 'top', far ? -5 : 5);
+      lg([[sky, 'Realized responses in five different years', 1], [mutedC, 'Plateau fixed at its mean', 1], [acc, 'Expected yield'], [wh, 'Optimal N']]);
+      const pp = []; let lo = Infinity, hi = -Infinity; for (let i = 0; i <= 120; i++) { const N = xmax * i / 120, y = Epi(N); pp.push([N, y]); lo = Math.min(lo, y); hi = Math.max(hi, y); }
+      const pad = (hi - lo) * 0.1 || 1;
+      const Q = plot(cv2, { x0: 0, x1: xmax, y0: lo - pad, y1: hi + pad, h: 190, xl: 'Nitrogen rate (lb N/acre)', yl: 'E(profit) ($/acre)' });
+      Q.line(pp, acc, 2.5); Q.vline(Ns, wh, [], 2); Q.dot(Ns, Epi(Ns), wh); Q.vline(knot, mutedC);
+      ro([['Kink at mean plateau', fmt(knot, 1) + ' lb'], ['α = r/(pβ₁)', fmt(alpha, 3)], ['Z_α (upper)', alpha > 0 && alpha < 1 ? fmt(invPhi(1 - alpha), 3) : '–'], ['Optimal N*', fmt(Ns, 1) + ' lb', 1], ['E(yield) at N*', fmt(Ey(Ns), 1) + ' bu'], ['E(profit) at N*', '$' + fmt(Epi(Ns), 2), 1], ['E(profit) at kink', '$' + fmt(Epi(knot), 2)], ['Gain over kink', '$' + fmt(Epi(Ns) - Epi(knot), 2)]]);
+    };
+    return () => draw();
+  }
+};
+
+/* ---- 2. Newsvendor and value of information ---- */
+TOOLS.newsvendor = {
+  title: 'Burrito vendor (newsvendor)', ch: '3', ico: 'B', desc: 'Make q before demand is known. Sales = min(q, D). Includes the value of a better forecast.',
+  init(root, preset, uid) {
+    let draw = () => {};
+    const C = ctrls(root, uid, [
+      ['p', 'Price per burrito p ($)', 2, 20, 0.5, 8, v => '$' + v],
+      ['c', 'Cost per burrito c ($)', 0.5, 15, 0.5, 3, v => '$' + v],
+      ['mu', 'Mean demand μ', 20, 300, 5, 100, v => v],
+      ['sd', 'Demand SD σ', 1, 80, 1, 25, v => v],
+      ['lam', 'Better forecast: SD × λ', 0.05, 1, 0.05, 0.5, v => v.toFixed(2)]], () => draw());
+    const cv = canvas(root), lg = legend(root), ro = readout(root);
+    note(root, 'E(π) = p·E[min(q, D)] − c·q. With normal demand the optimum sets F(q*) = 1 − c/p (the critical ratio). Value of information = E(π*) with the better forecast − E(π*) with the original forecast.');
+    draw = () => {
+      const { p, c, mu, sd, lam } = C.get();
+      const acc = css('--accent'), wh = css('--wheat'), sky = css('--sky'), mutedC = css('--muted');
+      if (c >= p) { ro([['Note', 'Cost ≥ price, so make nothing (q* = 0).', 1]]); plot(cv, { x0: 0, x1: 1, y0: 0, y1: 1, h: 220 }); lg([]); return; }
+      const G = z => phi(z) - z * (1 - Phi(z));
+      const Epi = (q, s) => p * (mu - s * G((q - mu) / s)) - c * q;
+      const cr = 1 - c / p, z = invPhi(cr), q1 = mu + sd * z, q2 = mu + lam * sd * z;
+      const e1 = (p - c) * mu - p * sd * phi(z), e2 = (p - c) * mu - p * lam * sd * phi(z);
+      const x1 = mu + 3.5 * sd, x0 = Math.max(0, mu - 3.5 * sd);
+      const a = [], b = []; let lo = Infinity; for (let i = 0; i <= 120; i++) { const q = x0 + (x1 - x0) * i / 120; const ya = Epi(q, sd), yb = Epi(q, lam * sd); a.push([q, ya]); b.push([q, yb]); lo = Math.min(lo, ya, yb); }
+      const hi = (p - c) * mu;
+      const P = plot(cv, { x0, x1, y0: Math.min(lo, 0), y1: hi * 1.08, h: 240, xl: 'Burritos made in the morning (q)', yl: 'Expected profit ($/day)' });
+      P.hline(hi, mutedC); P.line(a, acc, 2.5); P.line(b, sky, 2.5, [7, 4]);
+      P.dot(q1, e1, acc); P.dot(q2, e2, sky); P.text('perfect information', x0, hi, mutedC, 'left', 'bottom', 4, -2);
+      lg([[acc, 'Original forecast (SD σ)'], [sky, 'Better forecast (SD λσ)', 1], [mutedC, 'Perfect information', 1]]);
+      ro([['Critical ratio 1 − c/p', fmt(cr, 3)], ['z*', fmt(z, 3)], ['q* (original)', fmt(q1, 1), 1], ['E(π*) original', '$' + fmt(e1, 2)], ['q* (better)', fmt(q2, 1)], ['E(π*) better', '$' + fmt(e2, 2)], ['Value of better forecast', '$' + fmt(e2 - e1, 2) + '/day', 1], ['Value of perfect info', '$' + fmt(hi - e1, 2) + '/day']]);
+    };
+    return () => draw();
+  }
+};
+
+/* ---- 3. Normal-normal Bayesian updating ---- */
+TOOLS.bayes = {
+  title: 'Prior × likelihood → posterior', ch: '5', ico: 'P', desc: 'Normal prior, normal likelihood for a mean. The posterior mean is a precision-weighted average.',
+  init(root, preset, uid) {
+    let draw = () => {};
+    const pre = document.createElement('div'); pre.className = 'filter'; root.appendChild(pre);
+    const C = ctrls(root, uid, [['m0', 'Prior mean μ₀', -1e6, 1e6, 'any', 10], ['t0', 'Prior SD σ₀', 0.001, 1e6, 'any', Math.sqrt(2)], ['yb', 'Sample mean ȳ', -1e6, 1e6, 'any', 5], ['s', 'SD of one observation σ', 0.001, 1e6, 'any', Math.sqrt(2)], ['n', 'Number of observations n', 1, 100000, 1, 1]], () => draw(), 'number');
+    const P0 = { equal: { m0: 10, t0: Math.sqrt(2).toFixed(4), yb: 5, s: Math.sqrt(2).toFixed(4), n: 1 }, weak: { m0: 10, t0: 100, yb: 5, s: Math.sqrt(2).toFixed(4), n: 1 }, tight: { m0: 10, t0: 0.1, yb: 5, s: Math.sqrt(2).toFixed(4), n: 1 }, corn: { m0: 150, t0: 40, yb: 175, s: 60, n: 6 }, many: { m0: 150, t0: 40, yb: 175, s: 60, n: 200 } };
+    const names = { equal: 'Equal precision (class worksheet)', weak: 'Weak prior (var 10⁴)', tight: 'Tight prior (var 0.01)', corn: 'Corn threshold prior N(150, 40²)', many: 'Same, n = 200' };
+    pre.innerHTML = Object.keys(P0).map(k => '<button type="button" data-k="' + k + '">' + names[k] + '</button>').join('');
+    $$('button', pre).forEach(b => b.onclick = () => { $$('button', pre).forEach(x => x.classList.toggle('on', x === b)); C.set(P0[b.dataset.k]); });
+    const cv = canvas(root), lg = legend(root), ro = readout(root);
+    note(root, 'Precision = 1/variance. Posterior precision = prior precision + n/σ². Posterior mean = weight × ȳ + (1 − weight) × μ₀, where weight = σ₀² / (σ₀² + σ²/n).');
+    draw = () => {
+      const { m0, t0, yb, s, n } = C.get();
+      if (!(t0 > 0 && s > 0 && n >= 1)) { ro([['Check inputs', 'SDs must be positive and n ≥ 1', 1]]); return; }
+      const lv = s * s / n, pv = t0 * t0, v1 = 1 / (1 / pv + 1 / lv), m1 = v1 * (m0 / pv + yb / lv), w = pv / (pv + lv);
+      const sds = [Math.sqrt(pv), Math.sqrt(lv), Math.sqrt(v1)], ms = [m0, yb, m1];
+      const lo = Math.min(...ms.map((m, i) => m - 3.5 * Math.min(sds[i], 4 * Math.max(sds[1], sds[2])))), hi = Math.max(...ms.map((m, i) => m + 3.5 * Math.min(sds[i], 4 * Math.max(sds[1], sds[2]))));
+      const dens = (x, m, sd) => phi((x - m) / sd) / sd;
+      const curves = [[m0, sds[0]], [yb, sds[1]], [m1, sds[2]]].map(([m, sd]) => { const a = []; for (let i = 0; i <= 200; i++) { const x = lo + (hi - lo) * i / 200; a.push([x, dens(x, m, sd)]); } return a; });
+      const ymax = Math.max(...curves.flat().map(p => p[1])) * 1.1;
+      const P = plot(cv, { x0: lo, x1: hi, y0: 0, y1: ymax, h: 240, xl: 'Parameter value (μ)', yl: 'Density', yf: () => '' });
+      const mutedC = css('--muted'), acc = css('--accent'), wh = css('--wheat');
+      P.line(curves[0], mutedC, 2, [6, 4]); P.line(curves[1], wh, 2); P.line(curves[2], acc, 3);
+      lg([[mutedC, 'Prior', 1], [wh, 'Likelihood of μ (ȳ, σ²/n)'], [acc, 'Posterior']]);
+      ro([['Weight on data', fmt(w, 4)], ['Weight on prior', fmt(1 - w, 4)], ['Posterior mean', fmt(m1, 3), 1], ['Posterior variance', fmt(v1, 4)], ['Posterior SD', fmt(Math.sqrt(v1), 4)], ['95% credible interval', fmt(m1 - 1.96 * Math.sqrt(v1), 2) + ' to ' + fmt(m1 + 1.96 * Math.sqrt(v1), 2), 1]]);
+    };
+    $('button', pre).classList.add('on');
+    return () => draw();
+  }
+};
+
+/* ---- 4. Utility, certainty equivalent and risk premium ---- */
+TOOLS.ce = {
+  title: 'Utility curve, CE and risk premium', ch: '6', ico: 'U', desc: 'Two-outcome gamble on any utility function. Draws the graph the professor said is likely on the exam.',
+  init(root, preset, uid) {
+    let draw = () => {};
+    const box = document.createElement('div'); box.className = 'ctrls';
+    box.innerHTML = '<div class="ctrl"><label for="' + uid + '-fam">Utility function</label><select id="' + uid + '-fam"><option value="sqrt">√w (risk averse)</option><option value="log">ln w (risk averse, CRRA = 1)</option><option value="cara">1 − e^(−rw) (CARA)</option><option value="pow">w^a / a (power, a &lt; 1)</option><option value="lin">w (risk neutral)</option><option value="sq">w² (risk seeking)</option></select></div>' +
+      '<div class="ctrl"><label for="' + uid + '-par">Parameter (r for CARA, a for power)</label><input type="number" id="' + uid + '-par" step="any" value="0.05"></div>' +
+      '<div class="ctrl"><label for="' + uid + '-w1">Outcome 1 (w₁)</label><input type="number" id="' + uid + '-w1" step="any" value="16"></div>' +
+      '<div class="ctrl"><label for="' + uid + '-w2">Outcome 2 (w₂)</label><input type="number" id="' + uid + '-w2" step="any" value="64"></div>' +
+      '<div class="ctrl"><label for="' + uid + '-p1">P(outcome 1)</label><input type="number" id="' + uid + '-p1" step="0.05" min="0" max="1" value="0.5"></div>';
+    root.appendChild(box);
+    $$('input,select', box).forEach(i => i.addEventListener('input', () => draw()));
+    const cv = canvas(root), lg = legend(root), ro = readout(root);
+    note(root, 'E[U(W)] = p₁U(w₁) + p₂U(w₂) lies on the chord. U(E[W]) lies on the curve. CE solves U(CE) = E[U(W)], and the risk premium is E[W] − CE.');
+    draw = () => {
+      const fam = $('#' + uid + '-fam').value, a = +$('#' + uid + '-par').value, w1 = +$('#' + uid + '-w1').value, w2 = +$('#' + uid + '-w2').value, p1 = Math.min(1, Math.max(0, +$('#' + uid + '-p1').value));
+      const F = {
+        sqrt: [w => Math.sqrt(w), u => u * u, 0], log: [w => Math.log(w), u => Math.exp(u), 1e-9],
+        cara: a > 0 ? [w => 1 - Math.exp(-a * w), u => -Math.log(1 - u) / a, -Infinity] : [w => w, u => u, -Infinity],
+        pow: a !== 0 ? [w => Math.pow(w, a) / a, u => Math.pow(a * u, 1 / a), 1e-9] : [w => Math.log(w), u => Math.exp(u), 1e-9],
+        lin: [w => w, u => u, -Infinity], sq: [w => w * w, u => Math.sqrt(u), 0]
+      }[fam];
+      const [U, Ui, minW] = F;
+      if (w1 < minW || w2 < minW) { ro([['Check outcomes', 'This utility needs outcomes ' + (minW > 0 ? '> 0' : '≥ 0'), 1]]); return; }
+      const EW = p1 * w1 + (1 - p1) * w2, EU = p1 * U(w1) + (1 - p1) * U(w2), UEW = U(EW), CE = Ui(EU), RP = EW - CE;
+      const lo0 = Math.min(w1, w2), hi0 = Math.max(w1, w2), pad = (hi0 - lo0) * 0.25 || 1;
+      const x0 = Math.max(minW > -Infinity ? Math.max(minW, 1e-6) : -Infinity, lo0 - pad), x1 = hi0 + pad;
+      const pts = []; for (let i = 0; i <= 160; i++) { const w = x0 + (x1 - x0) * i / 160; pts.push([w, U(w)]); }
+      const ys = pts.map(p => p[1]); let y0 = Math.min(...ys), y1 = Math.max(...ys); const yp = (y1 - y0) * 0.08; y0 -= yp; y1 += yp;
+      const P = plot(cv, { x0, x1, y0, y1, h: 270, xl: 'Wealth or profit (w)', yl: 'Utility U(w)', yf: v => fmt(v, Math.abs(v) < 10 ? 2 : 0) });
+      const acc = css('--accent'), wh = css('--wheat'), mutedC = css('--muted'), sky = css('--sky'), bad = css('--bad');
+      P.line(pts, acc, 2.5); P.line([[w1, U(w1)], [w2, U(w2)]], mutedC, 1.5);
+      P.dot(w1, U(w1), acc); P.dot(w2, U(w2), acc);
+      P.line([[EW, y0], [EW, UEW]], mutedC, 1, [4, 4]); P.dot(EW, UEW, acc); P.dot(EW, EU, wh);
+      P.line([[CE, EU], [EW, EU]], wh, 1.5, [4, 4]); P.line([[CE, y0], [CE, EU]], sky, 1.5, [4, 4]); P.dot(CE, EU, sky);
+      P.text('U(E[W])', EW, UEW, acc, 'left', 'bottom', 6, -4); P.text('E[U(W)]', EW, EU, wh, 'left', 'top', 6, 4);
+      P.text('CE', CE, y0, sky, 'right', 'bottom', -4, -4); P.text('E[W]', EW, y0, mutedC, 'left', 'bottom', 4, -4);
+      if (Math.abs(RP) > (x1 - x0) * 0.02) { const yy = y0 + (y1 - y0) * 0.12; P.line([[Math.min(CE, EW), yy], [Math.max(CE, EW), yy]], bad, 2); P.text('risk premium', (CE + EW) / 2, yy, bad, 'center', 'bottom', 0, -3); }
+      lg([[acc, 'Utility curve'], [mutedC, 'Chord between outcomes'], [sky, 'Certainty equivalent', 1]]);
+      ro([['E[W]', fmt(EW, 3)], ['E[U(W)]', fmt(EU, 4)], ['U(E[W])', fmt(UEW, 4)], ['CE', fmt(CE, 3), 1], ['Risk premium', fmt(RP, 3), 1], ['Attitude', RP > 1e-9 ? 'risk averse' : RP < -1e-9 ? 'risk seeking' : 'risk neutral']]);
+    };
+    return () => draw();
+  }
+};
+
+/* ---- 5. Risk ranking lab: E-V, FSD, SSD and SERF ---- */
+TOOLS.rank = {
+  title: 'Risk ranking: E-V, FSD, SSD and SERF', ch: '7', ico: 'S', desc: 'Paste a payoff table. Get means, variances, efficient sets, CDF plots and certainty-equivalent curves.',
+  init(root, preset, uid) {
+    let draw = () => {};
+    const PRE = {
+      cotton: { txt: 'p: 0.10, 0.30, 0.35, 0.25\nA1 open boll picker: 89.2, 72.5, 45.9, 24.7\nA2 storm resistant picker: 82.4, 68.1, 49.3, 30.6\nA3 storm resistant stripper: 65.3, 57.8, 53.2, 40.4', r0: 0, r1: 0.1 },
+      abc: { txt: 'p: 0.2, 0.2, 0.2, 0.2, 0.2\nA: -4, -4, -4, 25, 25\nB: -5, 5, 15, 25, 35\nC: -5, 5, 5, 5, 36', r0: 0, r1: 0.1 }
+    };
+    const pick = document.createElement('div'); pick.className = 'filter'; root.appendChild(pick);
+    pick.innerHTML = '<button type="button" data-k="cotton">Cotton varieties (Assignments 7 and 9, $1,000)</button><button type="button" data-k="abc">A, B, C example (Oct 5 notebook, $1,000)</button>';
+    const ta = document.createElement('textarea'); ta.id = uid + '-ta'; ta.setAttribute('aria-label', 'Payoff table'); root.appendChild(ta);
+    const C = ctrls(root, uid, [['r0', 'SERF: lowest r', -1, 10, 'any', 0], ['r1', 'SERF: highest r', -1, 10, 'any', 0.1]], () => draw(), 'number');
+    const p0 = preset && PRE[preset] ? preset : 'cotton';
+    const use = k => { ta.value = PRE[k].txt; C.set({ r0: PRE[k].r0, r1: PRE[k].r1 }); $$('button', pick).forEach(b => b.classList.toggle('on', b.dataset.k === k)); };
+    $$('button', pick).forEach(b => b.onclick = () => use(b.dataset.k));
+    ta.addEventListener('input', () => draw());
+    const out = document.createElement('div'); root.appendChild(out);
+    const h1 = document.createElement('h4'); h1.textContent = 'Cumulative distribution functions'; root.appendChild(h1);
+    const cv1 = canvas(root), lg1 = legend(root);
+    const h2 = document.createElement('h4'); h2.textContent = 'SERF: certainty equivalent vs absolute risk aversion (negative exponential utility)'; root.appendChild(h2);
+    const cv2 = canvas(root), lg2 = legend(root);
+    note(root, 'Format: a line “p: …” with the probabilities (optional; equal weights if missing), then one line per alternative, “Name: outcome, outcome, …”. r is per unit of the outcomes (per $1,000 here). CE(r) = −(1/r)·ln Σ pᵢe^(−r·wᵢ), and CE(0) = mean.');
+    draw = () => {
+      const lines = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+      let probs = null; const alts = [];
+      lines.forEach(L => { const i = L.indexOf(':'); if (i < 0) return; const name = L.slice(0, i).trim(), nums = L.slice(i + 1).split(/[,\s]+/).filter(Boolean).map(Number); if (/^p(rob)?s?$/i.test(name)) probs = nums; else alts.push({ name, x: nums }); });
+      if (!alts.length) { out.innerHTML = '<p class="muted">Add at least one alternative.</p>'; return; }
+      const k = alts[0].x.length;
+      if (alts.some(a => a.x.length !== k || a.x.some(v => !isFinite(v)))) { out.innerHTML = '<p class="warn"><span class="lbl">Check the table</span>Every alternative needs the same number of numeric outcomes.</p>'; return; }
+      let warn = '';
+      if (!probs) probs = Array(k).fill(1 / k);
+      if (probs.length !== k) { out.innerHTML = '<p class="warn"><span class="lbl">Check the table</span>The probability line needs ' + k + ' numbers.</p>'; return; }
+      const ps = probs.reduce((a, b) => a + b, 0); if (Math.abs(ps - 1) > 1e-6) { warn = 'Probabilities summed to ' + fmt(ps, 4) + '; they were rescaled to sum to 1.'; probs = probs.map(p => p / ps); }
+      const cols = ['--c1', '--c2', '--c3', '--c4', '--c5', '--c6', '--c7', '--c8'].map(css);
+      alts.forEach((a, i) => { a.col = cols[i % cols.length]; a.mean = a.x.reduce((s, v, j) => s + probs[j] * v, 0); a.vari = a.x.reduce((s, v, j) => s + probs[j] * (v - a.mean) ** 2, 0); a.sd = Math.sqrt(a.vari); });
+      const grid = Array.from(new Set(alts.flatMap(a => a.x))).sort((u, v) => u - v);
+      const cdf = (a, z) => a.x.reduce((s, v, j) => s + (v <= z + 1e-12 ? probs[j] : 0), 0);
+      alts.forEach(a => { a.F = grid.map(z => cdf(a, z)); a.I = [0]; for (let j = 1; j < grid.length; j++) a.I.push(a.I[j - 1] + a.F[j - 1] * (grid[j] - grid[j - 1])); });
+      const eps = 1e-9;
+      const fsd = (A, B) => A.F.every((f, j) => f <= B.F[j] + eps) && A.F.some((f, j) => f < B.F[j] - eps);
+      const ssd = (A, B) => A.I.every((f, j) => f <= B.I[j] + eps) && (A.I.some((f, j) => f < B.I[j] - eps) || A.F.some((f, j) => f < B.F[j] - eps));
+      const ev = (A, B) => A.mean >= B.mean - eps && A.vari <= B.vari + eps && (A.mean > B.mean + eps || A.vari < B.vari - eps);
+      const eff = rel => alts.filter(B => !alts.some(A => A !== B && rel(A, B))).map(a => a.name.split(' ')[0]).join(', ');
+      let h = (warn ? '<p class="exam"><span class="lbl">Note</span>' + warn + '</p>' : '') + '<div class="scrollx"><table class="t"><thead><tr><th>Alternative</th><th>Mean</th><th>Variance</th><th>SD</th><th>Min</th><th>Max</th></tr></thead><tbody>' +
+        alts.map(a => '<tr><td><span style="color:' + a.col + ';font-weight:700">■</span> ' + esc(a.name) + '</td><td>' + fmt(a.mean, 3) + '</td><td>' + fmt(a.vari, 3) + '</td><td>' + fmt(a.sd, 3) + '</td><td>' + fmt(Math.min(...a.x), 2) + '</td><td>' + fmt(Math.max(...a.x), 2) + '</td></tr>').join('') + '</tbody></table></div>';
+      h += '<div class="readout"><div class="hl"><span>Highest expected value</span><b>' + esc(alts.slice().sort((u, v) => v.mean - u.mean)[0].name.split(' ')[0]) + '</b></div><div><span>E-V efficient set</span><b>{' + eff(ev) + '}</b></div><div><span>FSD efficient set</span><b>{' + eff(fsd) + '}</b></div><div><span>SSD efficient set</span><b>{' + eff(ssd) + '}</b></div></div>';
+      h += '<h4>Pairwise dominance (row dominates column)</h4><div class="scrollx"><table class="t"><thead><tr><th></th>' + alts.map(a => '<th>' + esc(a.name.split(' ')[0]) + '</th>').join('') + '</tr></thead><tbody>' +
+        alts.map(A => '<tr><td>' + esc(A.name.split(' ')[0]) + '</td>' + alts.map(B => '<td>' + (A === B ? '–' : [ev(A, B) ? 'E-V' : '', fsd(A, B) ? 'FSD' : '', ssd(A, B) ? 'SSD' : ''].filter(Boolean).join(' · ') || ' ') + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+      out.innerHTML = h;
+      const lo = grid[0], hi = grid[grid.length - 1], pad = (hi - lo) * 0.08 || 1;
+      const P = plot(cv1, { x0: lo - pad, x1: hi + pad, y0: 0, y1: 1.05, h: 230, xl: 'Outcome', yl: 'Cumulative probability' });
+      alts.forEach((a, i) => { const pts = [[lo - pad, 0]]; grid.forEach((z, j) => { pts.push([z, j ? a.F[j - 1] : 0]); pts.push([z, a.F[j]]); }); pts.push([hi + pad, 1]); P.line(pts.map(p => [p[0] + (i - (alts.length - 1) / 2) * (hi - lo) * 0.002, p[1]]), a.col, 2.2, i % 2 ? [7, 4] : []); });
+      lg1(alts.map((a, i) => [a.col, esc(a.name), i % 2]));
+      const { r0, r1 } = C.get();
+      const CE = (a, r) => Math.abs(r) < 1e-12 ? a.mean : (() => { const m = Math.min(...a.x); const s = a.x.reduce((t, v, j) => t + probs[j] * Math.exp(-r * (v - m)), 0); return m - Math.log(s) / r; })();
+      if (!(r1 > r0)) { lg2([]); plot(cv2, { x0: 0, x1: 1, y0: 0, y1: 1, h: 200 }); return; }
+      const series = alts.map(a => { const pts = []; for (let i = 0; i <= 80; i++) { const r = r0 + (r1 - r0) * i / 80; pts.push([r, CE(a, r)]); } return pts; });
+      const all = series.flat().map(p => p[1]); const ylo = Math.min(...all), yhi = Math.max(...all), yp = (yhi - ylo) * 0.1 || 1;
+      const Q = plot(cv2, { x0: r0, x1: r1, y0: ylo - yp, y1: yhi + yp, h: 230, xl: 'Absolute risk aversion r', yl: 'Certainty equivalent' });
+      series.forEach((s, i) => Q.line(s, alts[i].col, 2.2, i % 2 ? [7, 4] : []));
+      const best = r => alts.reduce((b, a) => CE(a, r) > CE(b, r) ? a : b, alts[0]).name.split(' ')[0];
+      const sw = []; let prev = best(r0); for (let i = 1; i <= 400; i++) { const r = r0 + (r1 - r0) * i / 400, b = best(r); if (b !== prev) { sw.push('switches to ' + b + ' near r = ' + fmt(r, 4)); prev = b; } }
+      lg2(alts.map((a, i) => [a.col, esc(a.name.split(' ')[0]) + ' (CE at r=' + fmt(r1, 3) + ': ' + fmt(CE(a, r1), 2) + ')', i % 2]).concat([[css('--muted'), 'Preferred at r=' + fmt(r0, 3) + ': ' + best(r0) + (sw.length ? '; ' + sw.join('; ') : '; no switch in this range')]]));
+    };
+    use(p0);
+    return () => draw();
+  }
+};
+
+/* ---- 6. Gaussian quadrature vs Monte Carlo ---- */
+function gaussHermite(K) {
+  /* probabilists' Hermite (standard normal weight) via Golub–Welsch with Jacobi eigenvalue iterations */
+  const A = Array.from({ length: K }, (_, i) => Array.from({ length: K }, (_, j) => (Math.abs(i - j) === 1 ? Math.sqrt(Math.max(i, j)) : 0)));
+  const V = Array.from({ length: K }, (_, i) => Array.from({ length: K }, (_, j) => (i === j ? 1 : 0)));
+  for (let sweep = 0; sweep < 100; sweep++) {
+    let off = 0; for (let i = 0; i < K; i++) for (let j = i + 1; j < K; j++) off += A[i][j] ** 2;
+    if (off < 1e-22) break;
+    for (let p = 0; p < K; p++) for (let q = p + 1; q < K; q++) {
+      if (Math.abs(A[p][q]) < 1e-300) continue;
+      const th = (A[q][q] - A[p][p]) / (2 * A[p][q]); const t = Math.sign(th || 1) / (Math.abs(th) + Math.sqrt(th * th + 1)); const c = 1 / Math.sqrt(t * t + 1), s = t * c;
+      for (let k = 0; k < K; k++) { const akp = A[k][p], akq = A[k][q]; A[k][p] = c * akp - s * akq; A[k][q] = s * akp + c * akq; }
+      for (let k = 0; k < K; k++) { const apk = A[p][k], aqk = A[q][k]; A[p][k] = c * apk - s * aqk; A[q][k] = s * apk + c * aqk; }
+      for (let k = 0; k < K; k++) { const vkp = V[k][p], vkq = V[k][q]; V[k][p] = c * vkp - s * vkq; V[k][q] = s * vkp + c * vkq; }
+    }
+  }
+  return Array.from({ length: K }, (_, i) => ({ x: A[i][i], w: V[0][i] ** 2 })).sort((a, b) => a.x - b.x);
+}
+TOOLS.quad = {
+  title: 'Numerical integration: quadrature vs Monte Carlo', ch: '8', ico: '∫', desc: 'Nodes and weights for a normal variable, the moments they match, and E[U] accuracy against Monte Carlo.',
+  init(root, preset, uid) {
+    let draw = () => {};
+    const C = ctrls(root, uid, [
+      ['mu', 'Mean μ', -50, 100, 1, 10, v => v],
+      ['sd', 'SD σ', 0.5, 40, 0.5, 14.1421, v => (+v).toFixed(2)],
+      ['K', 'Quadrature nodes K', 1, 8, 1, 2, v => v],
+      ['r', 'CARA r for the test integrand', 0.005, 0.2, 0.005, 0.05, v => (+v).toFixed(3)],
+      ['n', 'Monte Carlo draws', 10, 5000, 10, 100, v => v]], () => draw());
+    const cv = canvas(root), lg = legend(root), out = document.createElement('div'); root.appendChild(out);
+    note(root, 'All three methods use E[g(X)] ≈ Σ pⱼ g(xⱼ). Empirical: the observed data, pⱼ = 1/n. Monte Carlo: random draws, pⱼ = 1/K. Gaussian quadrature: chosen nodes and weights that match raw moments through degree 2K − 1. Defaults reproduce the class example: mean 10, variance 200, two nodes at 10 ± √200.');
+    draw = () => {
+      const { mu, sd, K, r, n } = C.get();
+      const nodes = gaussHermite(K).map(o => ({ x: mu + sd * o.x, w: o.w }));
+      const raw = m => { const a = [1, mu]; for (let k = 2; k <= m; k++) a.push(mu * a[k - 1] + (k - 1) * sd * sd * a[k - 2]); return a[m]; };
+      let rows = ''; for (let m = 0; m <= 2 * K + 1; m++) { const ex = raw(m), qd = nodes.reduce((s, o) => s + o.w * o.x ** m, 0); const ok = Math.abs(qd - ex) <= 1e-7 * Math.max(1, Math.abs(ex)); rows += '<tr><td>' + m + '</td><td>' + fmt(ex, 3) + '</td><td>' + fmt(qd, 3) + '</td><td>' + (ok ? '✓ match' : '✗ differs') + '</td></tr>'; }
+      const ceExact = mu - r * sd * sd / 2;
+      const ceQ = -Math.log(nodes.reduce((s, o) => s + o.w * Math.exp(-r * (o.x - mu)), 0)) / r + mu;
+      const rnd = mulberry(2026); let acc = 0; for (let i = 0; i < n; i++) { const u1 = rnd() || 1e-12, u2 = rnd(); const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2); acc += Math.exp(-r * sd * z); }
+      const ceMC = mu - Math.log(acc / n) / r;
+      out.innerHTML = '<h4>Nodes and weights</h4><div class="scrollx"><table class="t"><thead><tr><th>Node j</th><th>xⱼ</th><th>pⱼ</th></tr></thead><tbody>' + nodes.map((o, j) => '<tr><td>' + (j + 1) + '</td><td>' + fmt(o.x, 4) + '</td><td>' + fmt(o.w, 5) + '</td></tr>').join('') + '</tbody></table></div>' +
+        '<h4>Raw moments E(X<sup>m</sup>)</h4><div class="scrollx"><table class="t"><thead><tr><th>m</th><th>Exact (normal)</th><th>Quadrature Σpⱼxⱼ<sup>m</sup></th><th>Check</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+        '<h4>Test: certainty equivalent with U = −e^(−rX)</h4><div class="readout"><div class="hl"><span>Exact CE = μ − rσ²/2</span><b>' + fmt(ceExact, 4) + '</b></div><div><span>Quadrature (K = ' + K + ')</span><b>' + fmt(ceQ, 4) + '</b></div><div><span>Quadrature error</span><b>' + fmt(ceQ - ceExact, 4) + '</b></div><div><span>Monte Carlo (n = ' + n + ', seed 2026)</span><b>' + fmt(ceMC, 4) + '</b></div><div><span>Monte Carlo error</span><b>' + fmt(ceMC - ceExact, 4) + '</b></div></div>';
+      const x0 = mu - 4 * sd, x1 = mu + 4 * sd, ymax = Math.max(phi(0) / sd, ...nodes.map(o => o.w)) * 1.12;
+      const P = plot(cv, { x0, x1, y0: 0, y1: ymax, h: 220, xl: 'x', yl: 'Density / weight', yf: v => fmt(v, 3) });
+      const pts = []; for (let i = 0; i <= 200; i++) { const x = x0 + (x1 - x0) * i / 200; pts.push([x, phi((x - mu) / sd) / sd]); }
+      P.line(pts, css('--accent'), 2.5); nodes.forEach(o => P.bar(o.x, o.w, css('--wheat'), 7));
+      lg([[css('--accent'), 'Normal density f(x)'], [css('--wheat'), 'Quadrature weights pⱼ at nodes xⱼ']]);
+    };
+    return () => draw();
+  }
+};
+
+/* ---- 7. Quadratic production function optimum ---- */
+TOOLS.quadopt = {
+  title: 'Quadratic response: optimal input', ch: '2', ico: 'Q', desc: 'y = β₀ + β₁N + β₂N². Expected-profit optimum N* = (r/p − β₁)/(2β₂).',
+  init(root, preset, uid) {
+    let draw = () => {};
+    const C = ctrls(root, uid, [['b0', 'β₀ (bu/ac)', 0, 60, 1, 20, v => v], ['b1', 'β₁', 0.05, 1.5, 0.01, 0.6, v => (+v).toFixed(2)], ['b2', 'β₂ (must be negative)', -0.02, -0.0005, 0.0005, -0.003, v => (+v).toFixed(4)], ['p', 'Price p ($/bu)', 2, 12, 0.1, 6, v => '$' + (+v).toFixed(2)], ['r', 'N price r ($/lb)', 0.1, 2, 0.01, 0.7, v => '$' + (+v).toFixed(2)]], () => draw());
+    const cv = canvas(root), lg = legend(root), ro = readout(root);
+    draw = () => {
+      const { b0, b1, b2, p, r } = C.get();
+      const y = N => b0 + b1 * N + b2 * N * N, pi = N => p * y(N) - r * N;
+      const Nmax = -b1 / (2 * b2); let Ns = (r / p - b1) / (2 * b2); Ns = Math.max(0, Ns);
+      const x1 = Math.max(Nmax * 1.3, 20);
+      const pts = [], pp = []; for (let i = 0; i <= 120; i++) { const N = x1 * i / 120; pts.push([N, y(N)]); }
+      const P = plot(cv, { x0: 0, x1, y0: Math.min(0, y(x1)), y1: y(Nmax) * 1.12, h: 230, xl: 'Nitrogen rate (lb N/acre)', yl: 'Yield (bu/acre)' });
+      P.line(pts, css('--accent'), 2.5); P.vline(Nmax, css('--muted')); P.vline(Ns, css('--wheat'), [], 2); P.dot(Ns, y(Ns), css('--wheat'));
+      lg([[css('--accent'), 'Expected yield'], [css('--muted'), 'Yield-maximizing N', 1], [css('--wheat'), 'Profit-maximizing N*']]);
+      ro([['Yield-max N = −β₁/(2β₂)', fmt(Nmax, 1)], ['Price ratio r/p', fmt(r / p, 4)], ['N* (profit max)', fmt(Ns, 1) + ' lb', 1], ['E(yield) at N*', fmt(y(Ns), 1)], ['E(profit) at N*', '$' + fmt(pi(Ns), 2), 1]]);
+    };
+    return () => draw();
+  }
+};
+
+/* ---- 8. Expected revenue and variance of a product ---- */
+TOOLS.revenue = {
+  title: 'E(PY) and var(PY): price × yield', ch: '2', ico: 'R', desc: 'Why expected revenue is not E(P)E(Y) when price and yield are correlated.',
+  init(root, preset, uid) {
+    let draw = () => {};
+    const C = ctrls(root, uid, [['mp', 'Mean price E(P) ($/bu)', 2, 12, 0.1, 6, v => '$' + (+v).toFixed(2)], ['sp', 'SD of price', 0, 3, 0.05, 1, v => (+v).toFixed(2)], ['my', 'Mean yield E(Y) (bu/ac)', 10, 200, 1, 45, v => v], ['sy', 'SD of yield', 0, 40, 0.5, 10, v => v], ['rho', 'Correlation ρ(P, Y)', -0.95, 0.95, 0.05, -0.3, v => (+v).toFixed(2)]], () => draw());
+    const ro = readout(root);
+    note(root, 'E(PY) = E(P)E(Y) + cov(P, Y). For bivariate normal P and Y: var(PY) = E(P)²var(Y) + E(Y)²var(P) + 2E(P)E(Y)cov + var(P)var(Y) + cov². With ρ = 0 the cov terms drop out.');
+    draw = () => {
+      const { mp, sp, my, sy, rho } = C.get(); const cv = rho * sp * sy;
+      const er = mp * my + cv, vr = mp * mp * sy * sy + my * my * sp * sp + 2 * mp * my * cv + sp * sp * sy * sy + cv * cv;
+      ro([['E(P)E(Y)', '$' + fmt(mp * my, 2)], ['cov(P, Y)', fmt(cv, 3)], ['E(PY) true expected revenue', '$' + fmt(er, 2), 1], ['Error from E(P)E(Y)', '$' + fmt(mp * my - er, 2)], ['SD of revenue', '$' + fmt(Math.sqrt(vr), 2), 1], ['SD if ρ were 0', '$' + fmt(Math.sqrt(mp * mp * sy * sy + my * my * sp * sp + sp * sp * sy * sy), 2)]]);
+    };
+    return () => draw();
+  }
+};
+
+/* ---------- start ---------- */
+applyTheme();
+route();
+})();
+</script>
